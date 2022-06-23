@@ -18,19 +18,21 @@ u8 inputflag;
 u8 bit_flag;
 u8 dot_flag;
 char inputbuf[10];
-
+u8 powerondelay;
+RTC_DateTypeDef DateBuf;  //获取日期结构体
+RTC_TimeTypeDef TimeBuf;   //获取时间结构体
 
 const char TESTDISP_BUTTON[2][5][6]={
 	{"设置",
 	"系统",
 	"",
 	"",
-	""},
+	"复位"},
 	{"SETUP",
 	"SYSTEM",
 	"",
 	"",
-	""}
+	"RST"}
 };
 
 const char SETUP_BUTTON[2][5][6]={
@@ -66,12 +68,12 @@ const char CAL_BUTTON[2][5][8]={
 	"设置",
 	"系统",
 	"",
-	""},
+	"复位"},
 	{"MEAS ",
 	"SETUP ",
 	"SYSTEM",
 	"",
-	""}
+	"复位"}
 	
 };
 
@@ -80,12 +82,12 @@ const char DATE_BUTTON1[2][5][8]={
 	"年-",
 	"月+",
 	"月-",
-	"1/2"},
+	"NEXT"},
 	{"YEAR+",
 	"YEAR-",
 	"MON+",
 	"MON+",
-	"1/2"}
+	"NEXT"}
 	
 };
 
@@ -94,12 +96,12 @@ const char DATE_BUTTON2[2][5][8]={
 	"日-",
 	"",
 	"",
-	"1/2"},
+	"PREV"},
 	{"DAY+",
 	"DAY-",
 	"",
 	"",
-	"1/2"}
+	"PREV"}
 	
 };
 
@@ -108,12 +110,12 @@ const char TIME_BUTTON1[2][5][8]={
 	"时-",
 	"分+",
 	"分-",
-	"1/2"},
+	"NEXT"},
 	{"HOUR+",
 	"HOUR-",
 	"MIN+",
 	"MIN+",
-	"1/2"}
+	"NEXT"}
 	
 };
 
@@ -122,12 +124,12 @@ const char TIME_BUTTON2[2][5][8]={
 	"秒-",
 	"",
 	"",
-	"1/2"},
+	"PREV"},
 	{"SEC+",
 	"SEC-",
 	"",
 	"",
-	"1/2"}
+	"PREV"}
 	
 };
 
@@ -205,17 +207,21 @@ const char CAL_ITEM[][15]={
 	"PT100_300",
 };
 
+const char CAL_DONE[][4]={
+	"OK"
+};
+
 const char TCTYPE_ITEM[][5]={
 	"TC-T",
 	"TC-K",
 	"TC-J",
 	"TC-N",
-	"1/2",
+	"NEXT",
 	"TC-E",
 	"TC-S",
 	"TC-R",
 	"TC-B",
-	"2/2",
+	"PREV",
 };
 
 const char DISTYPE_ITEM[][5]={
@@ -233,6 +239,14 @@ const char UNIT_ITEM[][3]={
 	"℃",
 	"K ",
 	"F ",
+	"",
+	"",
+};
+
+const char UNIT_DISP_ITEM[][6]={
+	"(℃)",
+	"(K) ",
+	"(F) ",
 	"",
 	"",
 };
@@ -405,8 +419,29 @@ const char USEROFFSET_ITEM[][5]={
 	"-1.0",
 	"+0.1",
 	"-0.1",
-	"EXIT"
+	"RST"
 };
+
+const char POWERON_ITEM[][32]={
+	"JK808 MULTI CHANNEL TEMP.METER",
+	"Initializing Channel 1...",
+	"Initializing Channel 2...",
+	"Initializing Channel 3...",
+	"Initializing Channel 4...",
+	"Initializing Channel 5...",
+	"Initializing Channel 6...",
+	"Initializing Channel 7...",
+	"Initializing Channel 8...",
+	"Done!"
+};
+
+void POWER_OFF(void)
+{
+	SaveSysPara(SYSPAR);//保存数据
+	powerondelay=0;
+	delay_ms(500);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_RESET);//关机
+}
 
 //==========================================================
 //函数名称：Hex_Format
@@ -492,6 +527,15 @@ void Hex_Format(int32_t dat , uint8_t Dot , uint8_t len , uint8_t dispzero)
 	}			
 }
 
+//触摸复位
+void TOUCH_RESET(void)
+{
+	SYSPAR.xFactor=0.0922570005;
+	SYSPAR.yFactor=0.0674763843;
+	SYSPAR.xOffset=-24;
+	SYSPAR.yOffset=-16;
+}
+
 
 
 void KEY_HANDLE(u8 key)
@@ -503,6 +547,10 @@ void KEY_HANDLE(u8 key)
 		{
 			switch(key)
 			{
+				case KEY_OFF:
+				{
+					POWER_OFF();
+				}break;
 //				case KEY_MEAS:
 //				{
 //					pageflag = PAGE_MEAS;
@@ -529,35 +577,35 @@ void KEY_HANDLE(u8 key)
 						}break;
 						case 1:
 						{
-							TempOffset[0]+=10;
+							SYSPAR.TempOffset[0]+=10;
 						}break;
 						case 2:
 						{
-							TempOffset[1]+=10;
+							SYSPAR.TempOffset[1]+=10;
 						}break;
 						case 3:
 						{
-							TempOffset[2]+=10;
+							SYSPAR.TempOffset[2]+=10;
 						}break;
 						case 4:
 						{
-							TempOffset[3]+=10;
+							SYSPAR.TempOffset[3]+=10;
 						}break;
 						case 5:
 						{
-							TempOffset[4]+=10;
+							SYSPAR.TempOffset[4]+=10;
 						}break;
 						case 6:
 						{
-							TempOffset[5]+=10;
+							SYSPAR.TempOffset[5]+=10;
 						}break;
 						case 7:
 						{
-							TempOffset[6]+=10;
+							SYSPAR.TempOffset[6]+=10;
 						}break;
 						case 8:
 						{
-							TempOffset[7]+=10;
+							SYSPAR.TempOffset[7]+=10;
 						}break;
 						default:break;
 					}
@@ -573,35 +621,35 @@ void KEY_HANDLE(u8 key)
 						}break;
 						case 1:
 						{
-							TempOffset[0]-=10;
+							SYSPAR.TempOffset[0]-=10;
 						}break;
 						case 2:
 						{
-							TempOffset[1]-=10;
+							SYSPAR.TempOffset[1]-=10;
 						}break;
 						case 3:
 						{
-							TempOffset[2]-=10;
+							SYSPAR.TempOffset[2]-=10;
 						}break;
 						case 4:
 						{
-							TempOffset[3]-=10;
+							SYSPAR.TempOffset[3]-=10;
 						}break;
 						case 5:
 						{
-							TempOffset[4]-=10;
+							SYSPAR.TempOffset[4]-=10;
 						}break;
 						case 6:
 						{
-							TempOffset[5]-=10;
+							SYSPAR.TempOffset[5]-=10;
 						}break;
 						case 7:
 						{
-							TempOffset[6]-=10;
+							SYSPAR.TempOffset[6]-=10;
 						}break;
 						case 8:
 						{
-							TempOffset[7]-=10;
+							SYSPAR.TempOffset[7]-=10;
 						}break;
 						default:break;
 					}
@@ -612,35 +660,35 @@ void KEY_HANDLE(u8 key)
 					{
 						case 1:
 						{
-							TempOffset[0]+=1;
+							SYSPAR.TempOffset[0]+=1;
 						}break;
 						case 2:
 						{
-							TempOffset[1]+=1;
+							SYSPAR.TempOffset[1]+=1;
 						}break;
 						case 3:
 						{
-							TempOffset[2]+=1;
+							SYSPAR.TempOffset[2]+=1;
 						}break;
 						case 4:
 						{
-							TempOffset[3]+=1;
+							SYSPAR.TempOffset[3]+=1;
 						}break;
 						case 5:
 						{
-							TempOffset[4]+=1;
+							SYSPAR.TempOffset[4]+=1;
 						}break;
 						case 6:
 						{
-							TempOffset[5]+=1;
+							SYSPAR.TempOffset[5]+=1;
 						}break;
 						case 7:
 						{
-							TempOffset[6]+=1;
+							SYSPAR.TempOffset[6]+=1;
 						}break;
 						case 8:
 						{
-							TempOffset[7]+=1;
+							SYSPAR.TempOffset[7]+=1;
 						}break;
 						default:break;
 					}
@@ -651,43 +699,49 @@ void KEY_HANDLE(u8 key)
 					{
 						case 1:
 						{
-							TempOffset[0]-=1;
+							SYSPAR.TempOffset[0]-=1;
 						}break;
 						case 2:
 						{
-							TempOffset[1]-=1;
+							SYSPAR.TempOffset[1]-=1;
 						}break;
 						case 3:
 						{
-							TempOffset[2]-=1;
+							SYSPAR.TempOffset[2]-=1;
 						}break;
 						case 4:
 						{
-							TempOffset[3]-=1;
+							SYSPAR.TempOffset[3]-=1;
 						}break;
 						case 5:
 						{
-							TempOffset[4]-=1;
+							SYSPAR.TempOffset[4]-=1;
 						}break;
 						case 6:
 						{
-							TempOffset[5]-=1;
+							SYSPAR.TempOffset[5]-=1;
 						}break;
 						case 7:
 						{
-							TempOffset[6]-=1;
+							SYSPAR.TempOffset[6]-=1;
 						}break;
 						case 8:
 						{
-							TempOffset[7]-=1;
+							SYSPAR.TempOffset[7]-=1;
 						}break;
 						default:break;
 					}
 				}break;
 				case KEY_F5:
 				{
-					itempos=0;
-					moveflag = 1;
+					if(itempos == 0)
+					{
+						memset((void *)SYSPAR.TempOffset,0,sizeof(SYSPAR.TempOffset));
+					}else{
+						SYSPAR.TempOffset[itempos-1]=0;
+					}
+//					itempos=0;
+//					moveflag = 1;
 				}break;				
 				case KEY_UP:
 				{
@@ -737,13 +791,13 @@ void KEY_HANDLE(u8 key)
 					}else{
 						SYSPAR.brtness=0;
 					}
-					SaveSysPara(SYSPAR);
+					//SaveSysPara(SYSPAR);
 					Brightness();
 				}break;
-//				case KEY_ACC:
-//				{
+				case KEY_ACC:
+				{
 //					memset(&SYSPAR,0,sizeof(SYSPAR));
-//				}break;
+				}break;
 				default:break;
 			}
 		}break;
@@ -751,6 +805,10 @@ void KEY_HANDLE(u8 key)
 		{
 			switch(key)
 			{
+				case KEY_OFF:
+				{
+					POWER_OFF();
+				}break;
 				case KEY_MEAS:
 				{
 					pageflag = PAGE_MEAS;
@@ -779,13 +837,13 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.SensorType[0]=1+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.speed=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
@@ -799,19 +857,25 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.unit=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 6:
 						{
 							SYSPAR.alarm=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 7:
 						{
 							SYSPAR.saveset=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							SYSPAR.interval+=10;
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -829,31 +893,42 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.SensorType[0]=2+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.speed=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							SYSPAR.unit=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 6:
 						{
 							SYSPAR.alarm=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 7:
 						{
 							SYSPAR.saveset=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							if(SYSPAR.interval<=10)
+							{
+								SYSPAR.interval=1;
+							}else{
+								SYSPAR.interval-=10;
+							}
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -866,19 +941,25 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.SensorType[0]=3+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.speed=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							SYSPAR.unit=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							SYSPAR.interval+=1;
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -891,7 +972,13 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.SensorType[0]=4+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							SYSPAR.interval-=1;
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -904,7 +991,7 @@ void KEY_HANDLE(u8 key)
 						{
 							buttonpage=!buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -949,16 +1036,23 @@ void KEY_HANDLE(u8 key)
 					}else{
 						SYSPAR.brtness=0;
 					}
-					SaveSysPara(SYSPAR);
+					//SaveSysPara(SYSPAR);
 					Brightness();
 				}break;
+
 				default:break;
 			}
+			SYSPARCOMP();
 		}break;
 		case PAGE_SYST:
 		{
 			switch(key)
 			{
+				
+				case KEY_OFF:
+				{
+					POWER_OFF();
+				}break;
 				case KEY_MEAS:
 				{
 					pageflag = PAGE_MEAS;
@@ -987,62 +1081,66 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.language=0;
 							displayflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.brtness=0;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							if(buttonpage == 0)
 							{
-								GetDate.Year++;
+								DateBuf=GetDate;
+								DateBuf.Year++;
 								moveflag = 1;
 							}else{
-								GetDate.Date++;
+								DateBuf=GetDate;
+								DateBuf.Date++;
 								moveflag = 1;
 							}
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
 							if(buttonpage == 0)
 							{
-								GetTime.Hours++;
+								TimeBuf=GetTime;
+								TimeBuf.Hours++;
 								moveflag = 1;
 							}else{
-								GetTime.Seconds++;
+								TimeBuf=GetTime;
+								TimeBuf.Seconds++;
 								moveflag = 1;
 							}
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
 							SYSPAR.touch=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -1060,62 +1158,66 @@ void KEY_HANDLE(u8 key)
 						{
 							SYSPAR.language=1;
 							displayflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.brtness=1;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							if(buttonpage == 0)
 							{
-								GetDate.Year--;
+								DateBuf=GetDate;
+								DateBuf.Year--;
 								moveflag = 1;
 							}else{
-								GetDate.Date--;
+								DateBuf=GetDate;
+								DateBuf.Date--;
 								moveflag = 1;
 							}
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
 							if(buttonpage == 0)
 							{
-								GetTime.Hours--;
+								TimeBuf=GetTime;
+								TimeBuf.Hours--;
 								moveflag = 1;
 							}else{
-								GetTime.Seconds--;
+								TimeBuf=GetTime;
+								TimeBuf.Seconds--;
 								moveflag = 1;
 							}
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
 							SYSPAR.touch=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -1126,51 +1228,54 @@ void KEY_HANDLE(u8 key)
 					{
 						case 0:
 						{
-							pageflag = PAGE_CAL;
-							displayflag = 1;
+							DISP_INPUT();
+//							pageflag = PAGE_CAL;
+//							displayflag = 1;
 						}break;
 //						case 1:
 //						{
 //							SYSPAR.language=1;
 //							displayflag = 1;
-//							SaveSysPara(SYSPAR);
+//							//SaveSysPara(SYSPAR);
 //						}break;
 						case 2:
 						{
 							SYSPAR.brtness=2;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
-							GetDate.Month++;
+							DateBuf=GetDate;
+							DateBuf.Month++;
 							moveflag = 1;
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
-							GetTime.Minutes++;
+							TimeBuf=GetTime;
+							TimeBuf.Minutes++;
 							moveflag = 1;
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
@@ -1188,41 +1293,43 @@ void KEY_HANDLE(u8 key)
 							SYSPAR.brtness=3;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=3;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=3;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
-							GetDate.Month--;
+							DateBuf=GetDate;
+							DateBuf.Month--;
 							moveflag = 1;
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
-							GetTime.Minutes--;
+							TimeBuf=GetTime;
+							TimeBuf.Minutes--;
 							moveflag = 1;
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=3;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
-							
+							TOUCH_RESET();
 						}break;
 						default:break;
 					}
@@ -1236,19 +1343,19 @@ void KEY_HANDLE(u8 key)
 							SYSPAR.brtness=4;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=4;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=4;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
@@ -1260,7 +1367,7 @@ void KEY_HANDLE(u8 key)
 							buttonpage=!buttonpage;
 							moveflag = 1;
 						}break;
-
+						
 						default:break;
 					}
 				}break;
@@ -1304,16 +1411,21 @@ void KEY_HANDLE(u8 key)
 					}else{
 						SYSPAR.brtness=0;
 					}
-					SaveSysPara(SYSPAR);
+					//SaveSysPara(SYSPAR);
 					Brightness();
 				}break;
 				default:break;
 			}
+			SYSPARCOMP();
 		}break;
 		case PAGE_CAL:
 		{
 			switch(key)
 			{
+				case KEY_OFF:
+				{
+					POWER_OFF();
+				}break;
 				case KEY_MEAS:
 				{
 					pageflag = PAGE_MEAS;
@@ -1323,6 +1435,10 @@ void KEY_HANDLE(u8 key)
 				{
 					pageflag = PAGE_SETP;
 					displayflag = 1;
+				}break;
+				case KEY_ACC:
+				{
+					DISP_INPUT();
 				}break;
 				case KEY_F1:
 				{
@@ -1385,6 +1501,18 @@ void KEY_HANDLE(u8 key)
 						default:break;
 					}
 				}break;
+				case KEY_F5:
+				{
+					switch(itempos)
+					{
+						case 0:
+						{
+							SYSPARRST();
+						}break;
+
+						default:break;
+					}
+				}break;
 				case KEY_UP:
 				{
 					if(itempos>0)
@@ -1409,6 +1537,8 @@ void KEY_HANDLE(u8 key)
 	KeyFlag=0;
 }
 
+
+
 void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 {
   u8 i;
@@ -1426,7 +1556,10 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 				{
 					case 0:
 					{
-						Lcd_Str16((u8 *)TESTDISP_BUTTON[SYSPAR.language][i],1+(i*70)+17,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+						if(i<4)
+							Lcd_Str16((u8 *)TESTDISP_BUTTON[SYSPAR.language][i],1+(i*70)+17,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+						else
+							Lcd_Str16((u8 *)TESTDISP_BUTTON[SYSPAR.language][i],1+(i*70)+17-15,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
 					}break;
 					case 1:
 					case 2:
@@ -1457,7 +1590,10 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 					}break;
 					case 1:
 					{
-						Lcd_Str16((u8 *)TCTYPE_ITEM[i+buttonpage*5],1+(i*70)+17,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+						if(i == 4 && i == 9)
+							Lcd_Str16((u8 *)TCTYPE_ITEM[i+buttonpage*5],1+(i*70)+17,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+						else
+							Lcd_Str16((u8 *)TCTYPE_ITEM[i+buttonpage*5],1+(i*70)+17-15,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
 					}break;
 					case 2:
 					{
@@ -1714,13 +1850,73 @@ void INPUT_CONFIRM(__packed int16_t *data)
 	}
 	KEY_COLORBLOCK(pageflag);
 	DISP_PAGE_ITEM(pageflag,itempos);
+	//SaveSysPara(SYSPAR);
+}
+
+void SN_CONFIRM(void)
+{
+	u8 i;
+	
+	bit_flag=0;
+	inputflag=0;
+	dot_flag=0;
+	strcpy((char *)SYSPAR.sn,inputbuf);
+	memset(inputbuf,0,sizeof(inputbuf));
+	LcdClear(BUTTONCOLOR);
+	DISP_TOP(PAGE_CAL);
+	KEY_COLORBLOCK(pageflag);
+	DISP_PAGE_ITEM(pageflag,itempos);
 	SaveSysPara(SYSPAR);
 }
 
+void INPUT_CANCEL(void)
+{
+	u8 i;
+	bit_flag=0;
+	inputflag=0;
+	dot_flag=0;
+	memset(inputbuf,0,sizeof(inputbuf));
+	LcdClear(BUTTONCOLOR);
+	if(pageflag == PAGE_SETP)
+	{
+		DISP_TOP(PAGE_SETP);
+		for(i=0;i<8;i++)
+		{
+			if(i%2)
+			{
+				Lcd_Str16((u8 *)SETUP_ITEM[SYSPAR.language][i],168,30+i/2*22,FILLBLOCK,BUTTONCOLOR);//2468
+			}else{
+				Lcd_Str16((u8 *)SETUP_ITEM[SYSPAR.language][i],8,30+i/2*22,FILLBLOCK,BUTTONCOLOR);//1357
+			}
+		}
+		KEY_COLORBLOCK(pageflag);
+		DISP_PAGE_ITEM(pageflag,itempos);
+	}else if(pageflag == PAGE_SYST){
+		DISP_TOP(PAGE_SYST);
+	
+		for(i=0;i<10;i++)
+		{
+			Lcd_Str16((u8 *)SYS_ITEM[SYSPAR.language][i],8,22+i*18,FILLBLOCK,BUTTONCOLOR);
+		}
+		for(i=0;i<4;i++)
+		{
+			Lcd_Str16((u8 *)SYS_ITEM[SYSPAR.language][i+10],168,22+(6+i)*18,FILLBLOCK,BUTTONCOLOR);
+		}
+		for(i=0;i<5;i++)
+		{
+			if(i<2)
+				Lcd_Str16((u8 *)SYSSET_ITEM[i],144,22+i*18,DATACOLOR,BUTTONCOLOR);
+			else
+				Lcd_Str16((u8 *)SYSSET_ITEM[i],144,22+(i+1)*18,DATACOLOR,BUTTONCOLOR);
+		}
+		DISP_PAGE_ITEM(pageflag,itempos);
+	}
+}
 
 void DISP_TEMP(void)//显示温度
 {
 	u8 i;
+	u8 compflag=0;
 	for(i=0;i<8;i++)
 	{
 		if(i%2)
@@ -1732,19 +1928,28 @@ void DISP_TEMP(void)//显示温度
 				else
 					LcdPrintStr24("------",168+40,42+i/2*38,DATACOLOR,BUTTONCOLOR);//2468);
 			}else{
-				DispTemp[i]=CurrentTemp[i]+TempOffset[i];
+				DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
 				Hex_Format(DispTemp[i],1,5,0);
 				if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
 				{
+					compflag=1;
 					if(i+1==itempos)
+					{
 						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,BUTTONCOLOR,TCALCOLOR);//2468);
-					else
+					}
+					else{
 						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,TCALCOLOR,BUTTONCOLOR);//2468);
+						
+					}
 				}else{
 					if(i+1==itempos)
+					{
 						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,BUTTONCOLOR,TOPCOLOR);//2468);
-					else
+					}
+					else{
 						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,TOPCOLOR,BUTTONCOLOR);//2468);
+						
+					}
 				}
 			}
 		}else{
@@ -1755,24 +1960,56 @@ void DISP_TEMP(void)//显示温度
 				else
 					LcdPrintStr24("------",8+40,42+i/2*38,DATACOLOR,BUTTONCOLOR);//1357);
 			}else{
-				DispTemp[i]=CurrentTemp[i]+TempOffset[i];
+				DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
 				Hex_Format(DispTemp[i],1,5,0);
 				if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
 				{
+					compflag=1;
 					if(i+1==itempos)
+					{
 						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,BUTTONCOLOR,TCALCOLOR);//1357);
-					else
+					}
+					else{
 						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,TCALCOLOR,BUTTONCOLOR);//1357);
+					}
 				}else{
 					if(i+1==itempos)
+					{
 						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,BUTTONCOLOR,TOPCOLOR);//1357);
-					else
+					}
+					else{
 						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,TOPCOLOR,BUTTONCOLOR);//1357);
+					}
 				}
 				
 			}
 		}
 	}
+	if(compflag==1 && SYSPAR.alarm == 0)
+	{
+		BuzzerOn();
+	}else{
+		BuzzerOff();
+	}
+}
+
+void DISP_ENVIROMENT_TEMP(void)//显示环境温度
+{
+	tmp0();
+	Hex_Format(enir_temp.adx,1,5,0);
+	Lcd_Str16((u8 *)DispBuf,100,2,TOPCOLOR,BUTTONCOLOR);
+}
+	
+static void DISP_TCTYPE(void)
+{
+	Lcd_Str16((u8 *)DISTYPE_ITEM[SYSPAR.SensorType[0]-1],110-10-5,1,DATACOLOR,BUTTONCOLOR);
+}
+
+static void DISP_UNIT(void)
+{
+	Lcd_Str16("(",110+32-10-5,3,DATACOLOR,BUTTONCOLOR);
+	Lcd_Str16(")",110+32-10+32-5,3,DATACOLOR,BUTTONCOLOR);
+	Lcd_Str16((u8 *)UNIT_ITEM[SYSPAR.unit],110+32-10+16-5,1,DATACOLOR,BUTTONCOLOR);
 }
 
 
@@ -1782,6 +2019,8 @@ void DISP_TEST(void)//测量显示页面固定显示
 	itempos=0;
 	LcdClear(BUTTONCOLOR);
 	DISP_TOP(PAGE_MEAS);
+	DISP_TCTYPE();
+	DISP_UNIT();
 	DISP_CHNUM();
 	for(i=0;i<5;i++)
 	{	
@@ -1794,6 +2033,8 @@ void DISP_TEST(void)//测量显示页面固定显示
 	}
 }
 
+
+	
 void DISP_SETUP(void)//测量设置页面固定显示
 {
 	u8 i;
@@ -1835,6 +2076,7 @@ void DISP_SYS(void)//系统设置页面固定显示
 		else
 			Lcd_Str16((u8 *)SYSSET_ITEM[i],144,22+(i+1)*18,DATACOLOR,BUTTONCOLOR);
 	}
+	Lcd_Str16((u8 *)SYSPAR.sn,144,22+2*18,DATACOLOR,BUTTONCOLOR);
 }
 
 void DISP_CAL(void)//校准页面固定显示
@@ -1979,8 +2221,16 @@ void DISP_PAGE_ITEM(u8 page,u8 pos)
 	KEY_COLORBLOCK(page);
 }
 
+void DISP_CAL_PROCESS(u8 step)
+{
+	Lcd_Str16((u8 *)CAL_DONE[0],SETCOL1+60,SETROW1+(step-1)*SETROWOFFSET,TCALCOLOR,BUTTONCOLOR);
+}
+
 void DISP_PAGE(void)
 {
+	bit_flag=0;
+	inputflag=0;
+	dot_flag=0;
 	switch(pageflag)
 	{
 		case PAGE_MEAS:
@@ -2009,11 +2259,11 @@ void DISP_TIME(void)//显示时间
 {
 	char timebuf[10];
 	char datebuf[10];
-	/* Get the RTC current Time */
-	HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-		/* Get the RTC current Date */
-	HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
-
+////	/* Get the RTC current Time */
+//	HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+//		/* Get the RTC current Date */
+//	HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+	RTC_Get_DateTimeCounter(&GetDate,&GetTime);
 	sprintf(timebuf,"%02d:%02d:%02d",GetTime.Hours,GetTime.Minutes,
 	GetTime.Seconds);
 	sprintf(datebuf,"20%02d-%02d-%02d",GetDate.Year,GetDate.Month,
@@ -2047,3 +2297,613 @@ void DISP_TIME(void)//显示时间
 	
 }
 
+void DISP_BAT(u8 cap)
+{
+	LcdFillRec(300,2,310,20,BUTTONCOLOR);
+	LcdFillRec(303,2,307,5,TOPCOLOR);
+	LcdPrintRec(300,5,310,20,TOPCOLOR);
+	LcdFillRec(301,6,309,19,TOPCOLOR);
+	if(cap < 25)
+	{
+		LcdFillRec(301,6,309,15,BUTTONCOLOR);
+	}else if(cap >=25 && cap < 50){
+		LcdFillRec(301,6,309,12,BUTTONCOLOR);
+	}else if(cap >=50 && cap < 75){
+		LcdFillRec(301,6,309,9,BUTTONCOLOR);
+	}else if(cap >=75){
+		
+	}
+	
+}
+
+void DISP_CHARGE(void)//充电图标
+{
+	LcdFillRec(300,2,310,20,BUTTONCOLOR);
+	LcdPrintVert(303,2,5,TOPCOLOR);
+	LcdPrintVert(303+4,2,5,TOPCOLOR);
+	LcdPrintHorz(300,7,11,TOPCOLOR);
+	LcdFillRec(302,8,308,15,TOPCOLOR);
+	LcdPrintHorz(303,16,5,TOPCOLOR);
+	LcdPrintHorz(304,17,3,TOPCOLOR);
+	LcdPrintVert(305,17,4,TOPCOLOR);
+	
+}
+
+void DISP_USB(void)//U盘图标
+{
+	LcdFillRec(260-10,6,266-10,9,ORANGE);
+	LcdFillRec(260+2-10,6+1,260+2-10,6+1,BUTTONCOLOR);
+	LcdFillRec(266-2-10,6+1,266-2-10,6+1,BUTTONCOLOR);
+	LcdFillRec(259-10,10,267-10,17,ORANGE);
+	LcdPrintHorz(260-10,18,7,ORANGE);
+	LcdPrintHorz(262-10,19,3,ORANGE);
+//	LcdPrintHorz(263,20,2,TOPCOLOR);
+}
+
+void DISP_HID(void)//上位机通讯图标
+{
+	LcdFillRec(270,8,271,8+10,TOPCOLOR);
+	LcdPrintHorz(268,8-1,6,TOPCOLOR);
+	LcdPrintHorz(269,8-2,4,TOPCOLOR);
+	LcdPrintHorz(270,8-3,2,TOPCOLOR);
+	
+	LcdFillRec(275,8-3,276,15,TOPCOLOR);
+	LcdPrintHorz(275-2,15+1,6,TOPCOLOR);
+	LcdPrintHorz(275-1,15+2,4,TOPCOLOR);
+	LcdPrintHorz(275,15+3,2,TOPCOLOR);
+	
+}
+
+void DrawLogo(u16 x,u16 y)
+{
+//	page_flag = 0xff;
+//	LCD_Clear(LCD_COLOR_BLACK);	
+	/*J*/
+	LcdPrintHorz(x,y,41,ORANGE);
+	LcdPrintHorz(x-1,y-1,44,ORANGE);
+	LcdPrintHorz(x-1,y-2,46,ORANGE);
+	LcdPrintHorz(x,y-3,46,ORANGE);
+	LcdPrintHorz(x+2,y-4,46,ORANGE);
+	LcdPrintHorz(x+35,y-5,14,ORANGE);
+	LcdPrintHorz(x+35,y-6,15,ORANGE);
+	LcdPrintHorz(x+35,y-7,15,ORANGE);
+	LcdPrintHorz(x+36,y-8,14,ORANGE);
+	LcdPrintHorz(x+36,y-9,15,ORANGE);
+	LcdPrintHorz(x+37,y-10,14,ORANGE);
+	LcdPrintHorz(x+37,y-11,14,ORANGE);
+	LcdPrintHorz(x+37,y-12,14,ORANGE);
+	LcdPrintHorz(x+38,y-13,14,ORANGE);
+	LcdPrintHorz(x+37,y-14,15,ORANGE);
+	LcdPrintHorz(x+38,y-15,14,ORANGE);
+	LcdPrintHorz(x+38,y-16,14,ORANGE);
+	LcdPrintHorz(x+38,y-17,15,ORANGE);
+	LcdPrintHorz(x+39,y-18,14,ORANGE);
+	LcdPrintHorz(x+39,y-19,14,ORANGE);
+	LcdPrintHorz(x+39,y-20,15,ORANGE);
+	LcdPrintHorz(x+40,y-21,14,ORANGE);
+	LcdPrintHorz(x+40,y-22,14,ORANGE);
+	LcdPrintHorz(x+40,y-23,14,ORANGE);
+	LcdPrintHorz(x+40,y-24,14,ORANGE);
+	LcdPrintHorz(x+41,y-25,13,ORANGE);
+	LcdPrintHorz(x+41,y-26,14,ORANGE);
+	LcdPrintHorz(x+41,y-27,14,ORANGE);
+	LcdPrintHorz(x+42,y-28,14,ORANGE);
+	LcdPrintHorz(x+42,y-29,14,ORANGE);
+	LcdPrintHorz(x+42,y-30,14,ORANGE);
+	LcdPrintHorz(x+42,y-31,15,ORANGE);
+	LcdPrintHorz(x+42,y-32,15,ORANGE);
+	LcdPrintHorz(x+43,y-33,13,ORANGE);
+	LcdPrintHorz(x+43,y-34,14,ORANGE);
+	LcdPrintHorz(x+44,y-35,13,ORANGE);
+	LcdPrintHorz(x+44,y-36,14,ORANGE);
+	LcdPrintHorz(x+44,y-37,14,ORANGE);
+	LcdPrintHorz(x+44,y-38,15,ORANGE);
+	LcdPrintHorz(x+44,y-39,15,ORANGE);
+	LcdPrintHorz(x+45,y-40,14,ORANGE);
+	LcdPrintHorz(x+45,y-41,14,ORANGE);
+	LcdPrintHorz(x+45,y-42,15,ORANGE);
+	LcdPrintHorz(x+45,y-43,15,ORANGE);
+	LcdPrintHorz(x+46,y-44,14,ORANGE);
+	LcdPrintHorz(x+46,y-45,14,ORANGE);
+	LcdPrintHorz(x+46,y-46,15,ORANGE);
+	LcdPrintHorz(x+47,y-47,14,ORANGE);
+	LcdPrintHorz(x+47,y-48,14,ORANGE);
+	LcdPrintHorz(x+47,y-49,15,ORANGE);
+	LcdPrintHorz(x+47,y-50,15,ORANGE);
+	LcdPrintHorz(x+48,y-51,14,ORANGE);
+	LcdPrintHorz(x+48,y-52,14,ORANGE);
+	LcdPrintHorz(x+48,y-53,14,ORANGE);
+	LcdPrintHorz(x+49,y-54,13,ORANGE);
+	LcdPrintHorz(x+49,y-55,14,ORANGE);
+	
+	/*i*/
+	LcdFillRec(x+72,y-54,x+72+12,y-54+3,ORANGE);
+	LcdPrintHorz(x+71,y-52,13,ORANGE);
+	LcdFillRec(x+71,y-51,x+71+12,y-51+4,ORANGE);
+	LcdFillRec(x+70,y-47,x+70+12,y-47+3,ORANGE);
+	
+	LcdPrintHorz(x+68,y-44+4,14,ORANGE);
+	LcdPrintHorz(x+69,y-43+4,13,ORANGE);
+	LcdPrintHorz(x+68,y-42+4,13,ORANGE);
+	LcdPrintHorz(x+68,y-41+4,12,ORANGE);
+	LcdFillRec(x+68-1,y-40+4,x+68-1+13,y-40+4+3,ORANGE);
+	LcdPrintHorz(x+68-1,y-37+4,12,ORANGE);
+	LcdFillRec(x+67-1,y-36+4,x+67-1+13,y-36+4+3,ORANGE);
+	LcdPrintHorz(x+67-1,y-33+4,12,ORANGE);
+	LcdFillRec(x+66-1,y-32+4,x+66-1+13,y-32+4+2,ORANGE);
+	LcdPrintHorz(x+66-1,y-30+4,12,ORANGE);
+	LcdFillRec(x+65-1,y-29+4,x+65-1+13,y-29+4+3,ORANGE);
+	LcdPrintHorz(x+64-1,y-26+4,14,ORANGE);
+	LcdFillRec(x+64-1,y-25+4,x+64-1+13,y-25+4+2,ORANGE);
+	LcdFillRec(x+64-1,y-23+4,x+64-1+12,y-23+4+2,ORANGE);
+	LcdPrintHorz(x+63-1,y-21+4,13,ORANGE);
+	LcdFillRec(x+63-1,y-20+4,x+63-1+12,y-20+4+2,ORANGE);
+	LcdFillRec(x+62-1,y-18+4,x+62-1+13,y-18+4+3,ORANGE);
+	LcdPrintHorz(x+62-1,y-15+4,12,ORANGE);
+	LcdFillRec(x+61-1,y-14+4,x+61-1+13,y-14+4+3,ORANGE);
+	LcdFillRec(x+60-1,y-11+4,x+60-1+13,y-11+4+2,ORANGE);
+	LcdFillRec(x+59-1,y-5,x+59-1+13,y-5+2,ORANGE);
+	LcdPrintHorz(x+59-1,y-3,14,ORANGE);
+	LcdFillRec(x+59-1,y-2,x+59-1+13,y-2+2,ORANGE);
+	LcdPrintHorz(x+59-1,y,12,ORANGE);
+	
+	/*n*/
+	LcdPrintHorz(x+88,y-40,23,ORANGE);
+	LcdPrintHorz(x+85,y-39,27,ORANGE);
+	LcdPrintHorz(x+84,y-38,30,ORANGE);
+	LcdPrintHorz(x+83,y-37,32,ORANGE);
+	LcdPrintHorz(x+83,y-36,3,ORANGE);
+	LcdPrintHorz(x+104,y-36,12,ORANGE);
+	LcdPrintHorz(x+83,y-35,1,ORANGE);
+	LcdPrintHorz(x+104,y-35,12,ORANGE);
+	LcdFillRec(x+104,y-34,x+104+12,y-34+3,ORANGE);
+	LcdFillRec(x+103,y-31,x+103+13,y-31+3,ORANGE);
+	LcdPrintHorz(x+102,y-28,13,ORANGE);
+	LcdPrintHorz(x+103,y-27,12,ORANGE);
+	LcdPrintHorz(x+102,y-26,13,ORANGE);
+	LcdFillRec(x+101,y-25,x+101+13,y-25+2,ORANGE);
+	LcdFillRec(x+101,y-23,x+101+12,y-23+2,ORANGE);
+	LcdFillRec(x+100,y-21,x+100+13,y-21+3,ORANGE);
+	LcdFillRec(x+99,y-18,x+99+13,y-18+3,ORANGE);
+	LcdPrintHorz(x+99,y-15,12,ORANGE);
+	LcdFillRec(x+98,y-14,x+98+13,y-14+3,ORANGE);
+	LcdPrintHorz(x+98,y-11,12,ORANGE);
+	LcdPrintHorz(x+97,y-10,13,ORANGE);
+	LcdFillRec(x+97,y-9,x+97+12,y-9+4,ORANGE);
+	LcdFillRec(x+96,y-5,x+96+12,y-5+3,ORANGE);
+	LcdFillRec(x+95,y-2,x+95+13,y-2+3,ORANGE);
+	
+	/*k*/
+	LcdPrintHorz(x+127,y-56,12,ORANGE);
+	LcdFillRec(x+126,y-55,x+126+13,y-55+3,ORANGE);
+	LcdFillRec(x+126,y-52,x+126+12,y-52+2,ORANGE);
+	LcdFillRec(x+125,y-50,x+125+12,y-50+2,ORANGE);
+	LcdPrintHorz(x+124,y-48,13,ORANGE);
+	LcdPrintHorz(x+124,y-47,12,ORANGE);
+	LcdPrintHorz(x+124,y-46,13,ORANGE);
+	LcdPrintHorz(x+124,y-45,12,ORANGE);
+	LcdFillRec(x+123,y-44,x+123+13,y-44+2,ORANGE);
+	LcdFillRec(x+123,y-42,x+123+12,y-42+3,ORANGE);
+	LcdPrintHorz(x+153,y-41,12,ORANGE);
+	LcdPrintHorz(x+151,y-40,13,ORANGE);
+	
+	LcdPrintHorz(x+122,y-39,13,ORANGE);
+	LcdPrintHorz(x+150,y-39,12,ORANGE);
+	
+	LcdFillRec(x+122,y-38,x+122+12,y-38+2,ORANGE);
+	LcdPrintHorz(x+148,y-38,13,ORANGE);
+	LcdPrintHorz(x+147,y-37,12,ORANGE);
+	
+	LcdFillRec(x+121,y-36,x+121+13,y-36+3,ORANGE);
+	LcdPrintHorz(x+146,y-36,12,ORANGE);
+	LcdPrintHorz(x+145,y-35,11,ORANGE);
+	LcdPrintHorz(x+143,y-34,12,ORANGE);
+	
+	LcdPrintHorz(x+120,y-33,13,ORANGE);
+	LcdPrintHorz(x+141,y-33,13,ORANGE);
+	
+	LcdPrintHorz(x+121,y-32,12,ORANGE);
+	LcdPrintHorz(x+140,y-32,12,ORANGE);
+	
+	LcdPrintHorz(x+120,y-31,13,ORANGE);
+	LcdPrintHorz(x+138,y-31,13,ORANGE);
+	
+	LcdPrintHorz(x+120,y-30,12,ORANGE);
+	LcdPrintHorz(x+137,y-30,13,ORANGE);
+	
+	LcdPrintHorz(x+119,y-29,13,ORANGE);
+	LcdPrintHorz(x+135,y-29,15,ORANGE);
+	
+	LcdPrintHorz(x+119,y-28,12,ORANGE);
+	LcdPrintHorz(x+134,y-28,16,ORANGE);
+	
+	LcdPrintHorz(x+119,y-27,31,ORANGE);
+	LcdPrintHorz(x+118,y-26,31,ORANGE);
+	LcdPrintHorz(x+118,y-25,32,ORANGE);
+	LcdPrintHorz(x+118,y-24,32,ORANGE);
+	LcdPrintHorz(x+117,y-23,33,ORANGE);
+	
+	LcdPrintHorz(x+118,y-22,19,ORANGE);
+	LcdPrintHorz(x+138,y-22,12,ORANGE);
+	
+	LcdPrintHorz(x+117,y-21,19,ORANGE);
+	LcdPrintHorz(x+138,y-21,12,ORANGE);
+	
+	LcdPrintHorz(x+117,y-20,18,ORANGE);
+	LcdPrintHorz(x+138,y-20,13,ORANGE);
+	
+	LcdPrintHorz(x+116,y-19,17,ORANGE);
+	LcdPrintHorz(x+138,y-19,13,ORANGE);
+	
+	LcdPrintHorz(x+116,y-18,16,ORANGE);
+	LcdPrintHorz(x+138,y-18,14,ORANGE);
+	
+	LcdPrintHorz(x+116,y-17,14,ORANGE);
+	LcdPrintHorz(x+138,y-17,14,ORANGE);
+	
+	LcdPrintHorz(x+116,y-16,13,ORANGE);
+	LcdPrintHorz(x+138,y-16,14,ORANGE);
+	
+	LcdFillRec(x+115,y-15,x+115+13,y-15+3,ORANGE);
+	LcdPrintHorz(x+115,y-12,12,ORANGE);
+	LcdFillRec(x+114,y-11,x+114+13,y-11+3,ORANGE);
+	LcdPrintHorz(x+114,y-8,12,ORANGE);
+	LcdFillRec(x+113,y-7,x+113+13,y-7+3,ORANGE);
+	LcdPrintHorz(x+112,y-4,14,ORANGE);
+	LcdFillRec(x+112,y-3,x+112+13,y-3+3,ORANGE);
+	LcdPrintHorz(x+112,y,12,ORANGE);
+	
+	LcdFillRec(x+139,y-15,x+139+13,y-15+3,ORANGE);	
+	LcdFillRec(x+139,y-12,x+139+14,y-12+2,ORANGE);
+	LcdFillRec(x+140,y-10,x+140+13,y-10+3,ORANGE);
+	LcdFillRec(x+140,y-7,x+140+14,y-7+3,ORANGE);
+	LcdFillRec(x+140,y-4,x+140+15,y-4+2,ORANGE);
+	LcdPrintHorz(x+141,y-2,14,ORANGE);
+	LcdPrintHorz(x+143,y-1,12,ORANGE);
+	LcdPrintHorz(x+145,y,10,ORANGE);
+	
+	/*o*/
+	LcdPrintHorz(x+173,y-41,35,ORANGE);
+	LcdPrintHorz(x+171,y-40,39,ORANGE);
+	LcdPrintHorz(x+169,y-39,41,ORANGE);
+	LcdPrintHorz(x+168,y-38,43,ORANGE);
+	
+	LcdPrintHorz(x+167,y-37,13,ORANGE);
+	LcdPrintHorz(x+198,y-37,13,ORANGE);
+	
+	LcdPrintHorz(x+166,y-36,13,ORANGE);
+	LcdPrintHorz(x+199,y-36,13,ORANGE);
+	
+	LcdPrintHorz(x+166,y-35,12,ORANGE);
+	LcdPrintHorz(x+198,y-35,14,ORANGE);
+	
+	LcdPrintHorz(x+165,y-34,13,ORANGE);
+	LcdPrintHorz(x+198,y-34,14,ORANGE);
+	
+	LcdPrintHorz(x+165,y-33,13,ORANGE);
+	LcdPrintHorz(x+198,y-33,13,ORANGE);
+	
+	LcdPrintHorz(x+165,y-32,13,ORANGE);
+	LcdPrintHorz(x+198,y-32,13,ORANGE);
+	
+	LcdFillRec(x+164,y-31,x+164+14,y-31+2,ORANGE);
+	LcdFillRec(x+197,y-31,x+197+14,y-31+2,ORANGE);
+	LcdPrintHorz(x+164,y-29,13,ORANGE);
+	LcdPrintHorz(x+197,y-29,13,ORANGE);
+	
+	LcdFillRec(x+163,y-28,x+163+14,y-28+2,ORANGE);
+	LcdFillRec(x+196,y-28,x+196+14,y-28+2,ORANGE);
+	LcdPrintHorz(x+163,y-26,13,ORANGE);
+	LcdPrintHorz(x+196,y-26,13,ORANGE);
+	
+	LcdPrintHorz(x+162,y-25,14,ORANGE);
+	LcdPrintHorz(x+196,y-25,13,ORANGE);
+	
+	LcdPrintHorz(x+162,y-25,13,ORANGE);
+	LcdPrintHorz(x+195,y-25,14,ORANGE);
+	
+	LcdPrintHorz(x+162,y-24,14,ORANGE);
+	LcdPrintHorz(x+195,y-24,13,ORANGE);
+	
+	LcdPrintHorz(x+162,y-23,13,ORANGE);
+	LcdPrintHorz(x+195,y-23,13,ORANGE);
+	
+	LcdPrintHorz(x+161,y-22,14,ORANGE);
+	LcdPrintHorz(x+194,y-22,14,ORANGE);
+	
+	LcdPrintHorz(x+161,y-21,14,ORANGE);
+	LcdPrintHorz(x+194,y-21,14,ORANGE);
+	
+	LcdPrintHorz(x+161,y-20,13,ORANGE);
+	LcdPrintHorz(x+194,y-20,13,ORANGE);
+	
+	LcdPrintHorz(x+160,y-19,14,ORANGE);
+	LcdPrintHorz(x+194,y-19,13,ORANGE);
+	
+	LcdPrintHorz(x+160,y-18,14,ORANGE);
+	LcdPrintHorz(x+193,y-18,14,ORANGE);
+	
+	LcdPrintHorz(x+160,y-17,13,ORANGE);
+	LcdPrintHorz(x+193,y-17,14,ORANGE);
+	
+	LcdPrintHorz(x+159,y-16,14,ORANGE);
+	LcdPrintHorz(x+193,y-16,14,ORANGE);
+	
+	LcdPrintHorz(x+160,y-15,13,ORANGE);
+	LcdPrintHorz(x+193,y-15,13,ORANGE);	
+	
+	LcdFillRec(x+159,y-14,x+159+13,y-14+4,ORANGE);
+	LcdPrintHorz(x+192,y-14,14,ORANGE);	
+	LcdFillRec(x+192,y-13,x+192+13,y-13+3,ORANGE);
+	
+	LcdFillRec(x+159,y-10,x+159+12,y-10+3,ORANGE);
+	LcdFillRec(x+191,y-10,x+191+13,y-10+2,ORANGE);
+	LcdPrintHorz(x+190,y-8,13,ORANGE);	
+	
+	LcdPrintHorz(x+159,y-7,14,ORANGE);
+	LcdPrintHorz(x+188,y-7,14,ORANGE);
+	
+	LcdPrintHorz(x+159,y-6,43,ORANGE);
+	LcdPrintHorz(x+160,y-5,41,ORANGE);
+	LcdPrintHorz(x+161,y-4,39,ORANGE);
+	LcdPrintHorz(x+162,y-3,36,ORANGE);
+	LcdPrintHorz(x+163,y-2,34,ORANGE);
+	LcdPrintHorz(x+164,y-1,32,ORANGE);
+	
+//	/*金*/
+//	LcdPrintHorz(x+224,y-36,18,ORANGE);
+//	LcdPrintHorz(x+223,y-35,22,ORANGE);
+//	LcdPrintHorz(x+222,y-34,24,ORANGE);
+//	LcdPrintHorz(x+221,y-33,25,ORANGE);
+//	
+//	LcdPrintHorz(x+221,y-32,9,ORANGE);
+//	LcdPrintHorz(x+238,y-32,8,ORANGE);
+//	
+//	LcdPrintHorz(x+220,y-31,9,ORANGE);
+//	LcdPrintHorz(x+238,y-31,9,ORANGE);
+//	
+//	LcdPrintHorz(x+219,y-30,9,ORANGE);
+//	LcdPrintHorz(x+238,y-30,9,ORANGE);
+//	
+//	LcdPrintHorz(x+218,y-29,9,ORANGE);
+//	LcdPrintHorz(x+239,y-29,8,ORANGE);
+//	
+//	LcdPrintHorz(x+218,y-28,8,ORANGE);
+//	LcdPrintHorz(x+239,y-28,9,ORANGE);
+//	
+//	LcdPrintHorz(x+217,y-27,8,ORANGE);
+//	LcdPrintHorz(x+226,y-27,22,ORANGE);
+//	
+//	LcdPrintHorz(x+215,y-26,33,ORANGE);
+//	LcdPrintHorz(x+214,y-25,35,ORANGE);
+//	
+//	LcdPrintHorz(x+213,y-24,9,ORANGE);
+//	LcdPrintHorz(x+227,y-24,8,ORANGE);
+//	LcdPrintHorz(x+232,y-24,9,ORANGE);
+//	
+//	LcdPrintHorz(x+213,y-23,8,ORANGE);
+//	LcdPrintHorz(x+227,y-23,9,ORANGE);
+//	LcdPrintHorz(x+232,y-23,9,ORANGE);
+//	
+//	LcdPrintHorz(x+227,y-22,8,ORANGE);
+//	LcdPrintHorz(x+226,y-21,9,ORANGE);
+//	LcdPrintHorz(x+226,y-20,8,ORANGE);
+//	
+//	LcdPrintHorz(x+213,y-19,34,ORANGE);
+//	LcdPrintHorz(x+212,y-18,35,ORANGE);
+//	LcdPrintHorz(x+212,y-17,35,ORANGE);
+//	
+//	LcdPrintHorz(x+225,y-16,8,ORANGE);
+//	
+//	LcdPrintHorz(x+213,y-15,7,ORANGE);
+//	LcdPrintHorz(x+225,y-15,8,ORANGE);
+//	LcdPrintHorz(x+238,y-15,7,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-14,8,ORANGE);
+//	LcdPrintHorz(x+225,y-14,8,ORANGE);
+//	LcdPrintHorz(x+237,y-14,8,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-13,8,ORANGE);
+//	LcdPrintHorz(x+224,y-13,9,ORANGE);
+//	LcdPrintHorz(x+237,y-13,7,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-12,8,ORANGE);
+//	LcdPrintHorz(x+224,y-12,8,ORANGE);
+//	LcdPrintHorz(x+236,y-12,8,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-11,8,ORANGE);
+//	LcdPrintHorz(x+223,y-11,9,ORANGE);
+//	LcdPrintHorz(x+235,y-11,8,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-10,8,ORANGE);
+//	LcdPrintHorz(x+223,y-10,9,ORANGE);
+//	LcdPrintHorz(x+235,y-10,7,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-9,8,ORANGE);
+//	LcdPrintHorz(x+223,y-9,8,ORANGE);
+//	LcdPrintHorz(x+235,y-9,7,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-8,8,ORANGE);
+//	LcdPrintHorz(x+222,y-8,9,ORANGE);
+//	LcdPrintHorz(x+234,y-8,7,ORANGE);
+//	
+//	LcdPrintHorz(x+212,y-7,9,ORANGE);
+//	LcdPrintHorz(x+222,y-7,19,ORANGE);
+
+//	LcdPrintHorz(x+214,y-6,16,ORANGE);
+//	LcdPrintHorz(x+231,y-6,8,ORANGE);
+//	
+//	LcdPrintHorz(x+217,y-5,4,ORANGE);
+//	LcdPrintHorz(x+222,y-5,8,ORANGE);
+//	LcdPrintHorz(x+232,y-5,4,ORANGE);
+//	
+//	LcdPrintHorz(x+222,y-4,8,ORANGE);
+//	
+//	LcdFillRec(x+206,y-3,x+206+39,y-3+2,ORANGE);
+//	
+//	/*科*/
+//	LcdPrintHorz(x+269,y-38,7,ORANGE);
+//	LcdPrintHorz(x+285,y-38,6,ORANGE);
+//	
+//	LcdPrintHorz(x+267,y-37,9,ORANGE);
+//	LcdPrintHorz(x+285,y-37,6,ORANGE);
+//	
+//	LcdPrintHorz(x+265,y-36,11,ORANGE);
+//	LcdPrintHorz(x+284,y-36,7,ORANGE);
+//	
+//	LcdPrintHorz(x+256,y-35,18,ORANGE);
+//	LcdPrintHorz(x+275,y-35,7,ORANGE);
+//	LcdPrintHorz(x+284,y-35,7,ORANGE);
+//	
+//	LcdPrintHorz(x+256,y-34,17,ORANGE);
+//	LcdPrintHorz(x+275,y-34,7,ORANGE);
+//	LcdPrintHorz(x+283,y-34,8,ORANGE);
+//	
+//	LcdPrintHorz(x+256,y-33,15,ORANGE);
+//	LcdPrintHorz(x+274,y-33,7,ORANGE);
+//	LcdPrintHorz(x+283,y-33,8,ORANGE);
+//	
+//	LcdPrintHorz(x+261,y-32,6,ORANGE);
+//	LcdPrintHorz(x+274,y-32,7,ORANGE);
+//	LcdPrintHorz(x+283,y-32,8,ORANGE);
+//	
+//	LcdPrintHorz(x+261,y-31,6,ORANGE);
+//	LcdPrintHorz(x+274,y-31,7,ORANGE);
+//	LcdPrintHorz(x+282,y-31,8,ORANGE);
+//	
+//	LcdPrintHorz(x+261,y-30,6,ORANGE);
+//	LcdPrintHorz(x+274,y-30,7,ORANGE);
+//	LcdPrintHorz(x+282,y-30,8,ORANGE);
+//	
+//	LcdPrintHorz(x+260,y-29,7,ORANGE);
+//	LcdPrintHorz(x+274,y-29,7,ORANGE);
+//	LcdPrintHorz(x+282,y-29,8,ORANGE);
+//	
+//	LcdPrintHorz(x+253,y-28,20,ORANGE);
+//	LcdPrintHorz(x+275,y-28,6,ORANGE);
+//	LcdPrintHorz(x+282,y-28,7,ORANGE);
+//	
+//	LcdPrintHorz(x+253,y-27,19,ORANGE);
+//	LcdPrintHorz(x+274,y-27,7,ORANGE);
+//	LcdPrintHorz(x+282,y-27,7,ORANGE);
+//	
+//	LcdPrintHorz(x+259,y-26,7,ORANGE);
+//	LcdPrintHorz(x+274,y-26,7,ORANGE);
+//	LcdPrintHorz(x+282,y-26,7,ORANGE);
+//	
+//	LcdPrintHorz(x+258,y-25,8,ORANGE);
+//	LcdPrintHorz(x+274,y-25,14,ORANGE);
+
+//	LcdPrintHorz(x+259,y-24,6,ORANGE);
+//	LcdPrintHorz(x+277,y-24,11,ORANGE);
+//	
+//	LcdPrintHorz(x+253,y-23,4,ORANGE);
+//	LcdPrintHorz(x+258,y-23,10,ORANGE);
+//	LcdPrintHorz(x+271,y-23,5,ORANGE);
+//	LcdPrintHorz(x+281,y-23,6,ORANGE);
+//	
+//	LcdPrintHorz(x+253,y-22,16,ORANGE);
+//	LcdPrintHorz(x+270,y-22,7,ORANGE);
+//	LcdPrintHorz(x+280,y-22,8,ORANGE);
+//	
+//	LcdPrintHorz(x+253,y-21,16,ORANGE);
+//	LcdPrintHorz(x+270,y-21,6,ORANGE);
+//	LcdPrintHorz(x+280,y-21,7,ORANGE);
+//	
+//	LcdPrintHorz(x+252,y-20,24,ORANGE);
+//	LcdPrintHorz(x+280,y-20,7,ORANGE);
+//	
+//	LcdPrintHorz(x+252,y-19,4,ORANGE);
+//	LcdPrintHorz(x+257,y-19,12,ORANGE);
+//	LcdPrintHorz(x+270,y-19,6,ORANGE);
+//	LcdPrintHorz(x+280,y-19,7,ORANGE);
+//	
+//	LcdPrintHorz(x+252,y-18,4,ORANGE);
+//	LcdPrintHorz(x+257,y-18,12,ORANGE);
+//	LcdPrintHorz(x+270,y-18,6,ORANGE);
+//	LcdPrintHorz(x+279,y-18,7,ORANGE);
+//	
+//	LcdPrintHorz(x+251,y-17,18,ORANGE);
+//	LcdPrintHorz(x+270,y-17,6,ORANGE);
+//	LcdPrintHorz(x+279,y-17,7,ORANGE);
+//		
+//	LcdPrintHorz(x+251,y-16,12,ORANGE);
+//	LcdPrintHorz(x+264,y-16,4,ORANGE);
+//	LcdPrintHorz(x+269,y-16,7,ORANGE);
+//	LcdPrintHorz(x+279,y-16,7,ORANGE);
+//	
+//	LcdPrintHorz(x+251,y-15,17,ORANGE);
+//	LcdPrintHorz(x+269,y-15,7,ORANGE);
+//	LcdPrintHorz(x+278,y-15,8,ORANGE);
+//	
+//	LcdPrintHorz(x+251,y-14,11,ORANGE);
+//	LcdPrintHorz(x+263,y-14,5,ORANGE);
+//	LcdPrintHorz(x+269,y-14,7,ORANGE);
+//	LcdPrintHorz(x+278,y-14,7,ORANGE);
+//	
+//	LcdPrintHorz(x+250,y-13,17,ORANGE);
+//	LcdPrintHorz(x+270,y-13,6,ORANGE);
+//	LcdPrintHorz(x+278,y-13,7,ORANGE);
+//	
+//	LcdPrintHorz(x+250,y-12,17,ORANGE);
+//	LcdPrintHorz(x+271,y-12,6,ORANGE);
+//	LcdPrintHorz(x+278,y-12,7,ORANGE);
+//	
+//	LcdPrintHorz(x+250,y-11,11,ORANGE);
+//	LcdPrintHorz(x+262,y-11,5,ORANGE);
+//	LcdPrintHorz(x+273,y-11,12,ORANGE);
+//	
+//	LcdPrintHorz(x+249,y-10,18,ORANGE);
+//	LcdPrintHorz(x+277,y-10,7,ORANGE);
+//	
+//	LcdPrintHorz(x+249,y-9,5,ORANGE);
+//	LcdPrintHorz(x+255,y-9,12,ORANGE);
+//	LcdPrintHorz(x+273,y-9,14,ORANGE);
+//	
+//	LcdPrintHorz(x+248,y-8,39,ORANGE);
+//	
+//	LcdPrintHorz(x+248,y-7,12,ORANGE);
+//	LcdPrintHorz(x+260,y-7,22,ORANGE);
+//	
+//	LcdPrintHorz(x+248,y-6,12,ORANGE);
+//	LcdPrintHorz(x+260,y-6,5,ORANGE);
+//	LcdPrintHorz(x+275,y-6,7,ORANGE);
+//	
+//	LcdPrintHorz(x+248,y-5,18,ORANGE);
+//	LcdPrintHorz(x+274,y-5,8,ORANGE);
+//	
+//	LcdPrintHorz(x+248,y-4,4,ORANGE);
+//	LcdPrintHorz(x+253,y-4,7,ORANGE);
+//	LcdPrintHorz(x+260,y-4,7,ORANGE);
+//	LcdPrintHorz(x+274,y-4,8,ORANGE);
+//	
+//	LcdPrintHorz(x+247,y-3,4,ORANGE);
+//	LcdPrintHorz(x+253,y-3,6,ORANGE);
+//	LcdPrintHorz(x+260,y-3,5,ORANGE);
+//	LcdPrintHorz(x+274,y-3,8,ORANGE);
+//	
+//	LcdPrintHorz(x+247,y-2,4,ORANGE);
+//	LcdPrintHorz(x+253,y-2,7,ORANGE);
+//	LcdPrintHorz(x+262,y-2,2,ORANGE);
+//	LcdPrintHorz(x+273,y-2,9,ORANGE);
+//	
+//	LcdPrintHorz(x+247,y-1,1,ORANGE);
+//	LcdPrintHorz(x+252,y-1,7,ORANGE);
+//	LcdPrintHorz(x+273,y-1,8,ORANGE);
+//	
+//	LcdPrintHorz(x+273,y,2,ORANGE);
+}
+
+void DISP_POWERON(void)
+{
+	u8 i;
+	LcdClear(BUTTONCOLOR);
+	DrawLogo(50,150);
+	delay_ms(800);
+	LcdClear(BUTTONCOLOR);
+	for(i=0;i<10;i++)
+	{
+		Lcd_Str16((u8 *)POWERON_ITEM[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
+		DelayMs(200);
+	}
+}

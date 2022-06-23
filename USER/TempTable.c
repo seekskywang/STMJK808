@@ -245,35 +245,22 @@ typedef struct { // 热电阻查询表的描述信息
 
 // const u16 bat_tab7[11]={2283,2300,2327,2340,2350,2363,2385,2407,2433,2468,2531};
  const u16 bat_tab84[12]={3050,3084,3123,3176,3204,3220,3244,3289,3332,3380,3450,3550};	//stm
- const u16 bat_tab[12]={2469,2502,2540,2560,2608,2645,2679,2712,2748,2783,2817,2851}; //apm32
+ const u16 bat_tab[16]={1880,1908,1931,1967,1997,2028,2054,2111,2140,2170,2197,2227,2251,2281,2309,2337}; //apm32
 
 u16 Tab_bat(u16 bat)
-{ const u16 *bv;
+{ 
   u16 batv;
-  u8 HighNum=0,LowNum=0;
-
- if(bat<bat_tab[0])		  batv=1;
- else if(bat>bat_tab[11])		 batv=100;
-   else
-   {   bv=bat_tab;
-  while(LowNum != HighNum)
-    {
-      if(bat > bv[(LowNum + HighNum)/2])        LowNum = (LowNum + HighNum)/2;
-      
-      else if(bat < bv[(LowNum + HighNum)/2])    HighNum = (LowNum + HighNum)/2;
-      
-      else
-      { LowNum = (LowNum + HighNum)/2;
-        HighNum = LowNum;
-        break;
-      }
-      if(bat >= bv[LowNum] && bat < bv[LowNum+1]) 
-        break;
-    }
-	if(bv[LowNum+1]!=bv[LowNum])        batv=LowNum*10+((bat-bv[LowNum])*10)/(bv[LowNum+1]-bv[LowNum]); 
-      else						        batv=LowNum*10;
-   }
-   return batv;
+	float batraw;
+	if(bat <= 1880)
+	{
+		batv=0;
+	}else if(bat >= 2337){
+		batv=100;
+	}else{
+		batraw=(float)bat*0.21881-411.37855;
+		batv=(u16)batraw;
+	}
+  return batv;
 }
 extern uint8_t tempOVER;
 // PT热电阻 AD => 温度, 单位为0.001摄氏度

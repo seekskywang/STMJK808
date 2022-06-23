@@ -216,83 +216,89 @@ void ac30_channel_on(u8 chm)
 	switch(chm)
 	 {
 	   case 0: 
-		    CH1ON();
+		  CH8OFF();  
 			CH2OFF();
 			CH3OFF();
 			CH4OFF();
 			CH5OFF();
 			CH6OFF();
 			CH7OFF();
-			CH8OFF();
+		  CH1ON();
 	   break;
 	   case 1: 
-		    CH1OFF();
-			CH2ON();
+		  CH1OFF();
 			CH3OFF();
 			CH4OFF();
 			CH5OFF();
 			CH6OFF();
 			CH7OFF();
 			CH8OFF();
+		 CH2ON();
 	   break;
 	   case 2: 
-		    CH1OFF();
-			CH2OFF();
-			CH3ON();
+			 CH2OFF();
+		   CH1OFF();
+			
 			CH4OFF();
 			CH5OFF();
 			CH6OFF();
 			CH7OFF();
 			CH8OFF();
+		  CH3ON();
 	   break;
 	   case 3: 
+			 CH3OFF();
 		    CH1OFF();
 			CH2OFF();
-			CH3OFF();
-			CH4ON();
+			
 			CH5OFF();
 			CH6OFF();
 			CH7OFF();
 			CH8OFF();
+		 CH4ON();
 	   break;
 	   case 4:
+			 CH4OFF();
 		    CH1OFF();
 			CH2OFF();
 			CH3OFF();
-			CH4OFF();
-			CH5ON();
+			
 			CH6OFF();
 			CH7OFF();
 			CH8OFF();
+		 CH5ON();
 	   break;
 	   case 5:
+			 CH5OFF();
 		    CH1OFF();
 			CH2OFF();
 			CH3OFF();
 			CH4OFF();
-			CH5OFF();
-			CH6ON();
+			
 			CH7OFF();
 			CH8OFF();
+		 CH6ON();
 	   break;
 	   case 6: 
+			 CH6OFF();
 		    CH1OFF();
 			CH2OFF();
 			CH3OFF();
 			CH4OFF();
 			CH5OFF();
-			CH6OFF();
-			CH7ON();
+			
 			CH8OFF();
+		 CH7ON();
 	   break;
 	   case 7: 
+			 CH7OFF();
 		    CH1OFF();
 			CH2OFF();
 			CH3OFF();
 			CH4OFF();
 			CH5OFF();
 			CH6OFF();
-			CH7OFF();
+			
 			CH8ON();
 	   break;
 		 

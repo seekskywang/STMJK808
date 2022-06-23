@@ -285,7 +285,7 @@ void TOUCH_Adjust(void)
 		/* 将比例因数进行数据处理，然后保存 */
     SYSPAR.xFactor = xFactor ;
     SYSPAR.yFactor = yFactor ;
-		SaveSysPara(SYSPAR);
+		//SaveSysPara(SYSPAR);
 //    TouchAdj.posState = 1;
 //    FLASH_WriteData(&TouchAdj.posState, TOUCH_ADJ_ADDR, sizeof(TouchAdj));            
 }
@@ -294,7 +294,7 @@ u8 TOUCH_SCAN(void)
 {
 	if(!TOUCH_IN)
 	{
-		if(touchflag == 0)
+		if(touchflag == 0 && SYSPAR.touch==0)
 		{
 			touchflag=1;
 			if(TOUCH_ReadXY(&TouchData.x, &TouchData.y) == 0XFF)
@@ -331,6 +331,39 @@ void TOUCH_HANDLE(u16 x,u16 y)
 							pageflag = PAGE_SETP;
 							displayflag = 1;
 						}break;
+						case 1:
+						{
+							SYSPAR.TempOffset[0]+=10;
+						}break;
+						case 2:
+						{
+							SYSPAR.TempOffset[1]+=10;
+						}break;
+						case 3:
+						{
+							SYSPAR.TempOffset[2]+=10;
+						}break;
+						case 4:
+						{
+							SYSPAR.TempOffset[3]+=10;
+						}break;
+						case 5:
+						{
+							SYSPAR.TempOffset[4]+=10;
+						}break;
+						case 6:
+						{
+							SYSPAR.TempOffset[5]+=10;
+						}break;
+						case 7:
+						{
+							SYSPAR.TempOffset[6]+=10;
+						}break;
+						case 8:
+						{
+							SYSPAR.TempOffset[7]+=10;
+						}break;
+						default:break;
 					}
 				}break;
 				case PAGE_SETP:
@@ -346,13 +379,13 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.SensorType[0]=1+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.speed=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
@@ -366,19 +399,25 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.unit=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 6:
 						{
 							SYSPAR.alarm=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 7:
 						{
 							SYSPAR.saveset=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							SYSPAR.interval+=10;
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -397,62 +436,66 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.language=0;
 							displayflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.brtness=0;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							if(buttonpage == 0)
 							{
-								GetDate.Year++;
+								DateBuf=GetDate;
+								DateBuf.Year++;
 								moveflag = 1;
 							}else{
-								GetDate.Date++;
+								DateBuf=GetDate;
+								DateBuf.Date++;
 								moveflag = 1;
 							}
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
 							if(buttonpage == 0)
 							{
-								GetTime.Hours++;
+								TimeBuf=GetTime;
+								TimeBuf.Hours++;
 								moveflag = 1;
 							}else{
-								GetTime.Seconds++;
+								TimeBuf=GetTime;
+								TimeBuf.Seconds++;
 								moveflag = 1;
 							}
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
 							SYSPAR.touch=0;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}			
@@ -471,6 +514,39 @@ void TOUCH_HANDLE(u16 x,u16 y)
 							pageflag = PAGE_SYST;
 							displayflag = 1;
 						}break;
+						case 1:
+						{
+							SYSPAR.TempOffset[0]-=10;
+						}break;
+						case 2:
+						{
+							SYSPAR.TempOffset[1]-=10;
+						}break;
+						case 3:
+						{
+							SYSPAR.TempOffset[2]-=10;
+						}break;
+						case 4:
+						{
+							SYSPAR.TempOffset[3]-=10;
+						}break;
+						case 5:
+						{
+							SYSPAR.TempOffset[4]-=10;
+						}break;
+						case 6:
+						{
+							SYSPAR.TempOffset[5]-=10;
+						}break;
+						case 7:
+						{
+							SYSPAR.TempOffset[6]-=10;
+						}break;
+						case 8:
+						{
+							SYSPAR.TempOffset[7]-=10;
+						}break;
+						default:break;
 					}	
 					
 				}break;
@@ -487,31 +563,41 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.SensorType[0]=2+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.speed=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							SYSPAR.unit=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 6:
 						{
 							SYSPAR.alarm=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 7:
 						{
 							SYSPAR.saveset=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							if(SYSPAR.interval<=10)
+							{
+								SYSPAR.interval=1;
+							}else{
+								SYSPAR.interval-=10;
+							}
+							moveflag = 1;
 						}break;
 						default:break;
 					}	
@@ -530,62 +616,66 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.language=1;
 							displayflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.brtness=1;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							if(buttonpage == 0)
 							{
-								GetDate.Year--;
+								DateBuf=GetDate;
+								DateBuf.Year--;
 								moveflag = 1;
 							}else{
-								GetDate.Date--;
+								DateBuf=GetDate;
+								DateBuf.Date--;
 								moveflag = 1;
 							}
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
 							if(buttonpage == 0)
 							{
-								GetTime.Hours--;
+								TimeBuf=GetTime;
+								TimeBuf.Hours--;
 								moveflag = 1;
 							}else{
-								GetTime.Seconds--;
+								TimeBuf=GetTime;
+								TimeBuf.Seconds--;
 								moveflag = 1;
 							}
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
 							SYSPAR.touch=1;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}	
@@ -599,7 +689,39 @@ void TOUCH_HANDLE(u16 x,u16 y)
 				{
 					switch(itempos)
 					{
-						
+						case 1:
+						{
+							SYSPAR.TempOffset[0]+=1;
+						}break;
+						case 2:
+						{
+							SYSPAR.TempOffset[1]+=1;
+						}break;
+						case 3:
+						{
+							SYSPAR.TempOffset[2]+=1;
+						}break;
+						case 4:
+						{
+							SYSPAR.TempOffset[3]+=1;
+						}break;
+						case 5:
+						{
+							SYSPAR.TempOffset[4]+=1;
+						}break;
+						case 6:
+						{
+							SYSPAR.TempOffset[5]+=1;
+						}break;
+						case 7:
+						{
+							SYSPAR.TempOffset[6]+=1;
+						}break;
+						case 8:
+						{
+							SYSPAR.TempOffset[7]+=1;
+						}break;
+						default:break;
 					}	
 					
 				}break;
@@ -611,19 +733,25 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.SensorType[0]=3+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 2:
 						{
 							SYSPAR.speed=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
 							SYSPAR.unit=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							SYSPAR.interval+=1;
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}	
@@ -635,51 +763,52 @@ void TOUCH_HANDLE(u16 x,u16 y)
 					{
 						case 0:
 						{
-							pageflag = PAGE_CAL;
-							displayflag = 1;
+							DISP_INPUT();
 						}break;
 //						case 1:
 //						{
 //							SYSPAR.language=1;
 //							displayflag = 1;
-//							SaveSysPara(SYSPAR);
+//							//SaveSysPara(SYSPAR);
 //						}break;
 						case 2:
 						{
 							SYSPAR.brtness=2;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
-							GetDate.Month++;
+							DateBuf=GetDate;
+							DateBuf.Month++;
 							moveflag = 1;
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
-							GetTime.Minutes++;
+							TimeBuf=GetTime;
+							TimeBuf.Minutes++;
 							moveflag = 1;
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=2;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
@@ -697,7 +826,39 @@ void TOUCH_HANDLE(u16 x,u16 y)
 				{
 					switch(itempos)
 					{
-						
+						case 1:
+						{
+							SYSPAR.TempOffset[0]-=1;
+						}break;
+						case 2:
+						{
+							SYSPAR.TempOffset[1]-=1;
+						}break;
+						case 3:
+						{
+							SYSPAR.TempOffset[2]-=1;
+						}break;
+						case 4:
+						{
+							SYSPAR.TempOffset[3]-=1;
+						}break;
+						case 5:
+						{
+							SYSPAR.TempOffset[4]-=1;
+						}break;
+						case 6:
+						{
+							SYSPAR.TempOffset[5]-=1;
+						}break;
+						case 7:
+						{
+							SYSPAR.TempOffset[6]-=1;
+						}break;
+						case 8:
+						{
+							SYSPAR.TempOffset[7]-=1;
+						}break;
+						default:break;
 					}	
 					
 				}break;
@@ -709,7 +870,13 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							SYSPAR.SensorType[0]=4+4*buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
+						}break;
+						case 8:
+						{
+							SYSPAR.interval-=1;
+							moveflag = 1;
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -723,41 +890,43 @@ void TOUCH_HANDLE(u16 x,u16 y)
 							SYSPAR.brtness=3;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=3;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=3;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
-							GetDate.Month--;
+							DateBuf=GetDate;
+							DateBuf.Month--;
 							moveflag = 1;
-							HAL_RTC_SetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 6:
 						{
-							GetTime.Minutes--;
+							TimeBuf=GetTime;
+							TimeBuf.Minutes--;
 							moveflag = 1;
-							HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+							SaveTime();
 						}break;
 						case 7:
 						{
 							SYSPAR.offsave=3;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 8:
 						{
-							
+							TOUCH_RESET();
 						}break;
 						default:break;
 					}	
@@ -769,11 +938,12 @@ void TOUCH_HANDLE(u16 x,u16 y)
 			{
 				case PAGE_MEAS:
 				{
-					switch(itempos)
+					if(itempos == 0)
 					{
-						
-					}	
-					
+						memset((void *)SYSPAR.TempOffset,0,sizeof(SYSPAR.TempOffset));
+					}else{
+						SYSPAR.TempOffset[itempos-1]=0;
+					}
 				}break;
 				case PAGE_SETP:
 				{
@@ -783,7 +953,7 @@ void TOUCH_HANDLE(u16 x,u16 y)
 						{
 							buttonpage=!buttonpage;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						default:break;
 					}
@@ -797,19 +967,19 @@ void TOUCH_HANDLE(u16 x,u16 y)
 							SYSPAR.brtness=4;
 							Brightness();
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 3:
 						{
 							SYSPAR.dimtime=4;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 4:
 						{
 							SYSPAR.autooff=4;
 							moveflag = 1;
-							SaveSysPara(SYSPAR);
+							//SaveSysPara(SYSPAR);
 						}break;
 						case 5:
 						{
@@ -828,6 +998,7 @@ void TOUCH_HANDLE(u16 x,u16 y)
 				}break;
 			}
 		}
+		SYSPARCOMP();
 	}else if(inputflag == 1)//数字输入框
 	{
 		if(y > NUMYCOR1 && y < NUMYCOR2)
@@ -858,18 +1029,136 @@ void TOUCH_HANDLE(u16 x,u16 y)
 				DEL_NUM();
 			}
 		}else if(y > CONYCOR1 && y < CONYCOR2 && x > CONXCOR1 && x < CONXCOR2){
-			if(itempos == 3)
+			switch(pageflag)
 			{
-				INPUT_CONFIRM(&SYSPAR.upper);
-			}else if(itempos == 4){
-				INPUT_CONFIRM(&SYSPAR.lower);
+				case PAGE_SETP:
+				{
+					if(itempos == 3)
+					{
+						INPUT_CONFIRM(&SYSPAR.upper);
+					}else if(itempos == 4){
+						INPUT_CONFIRM(&SYSPAR.lower);
+					}
+					SYSPARCOMP();
+				}break;
+				case PAGE_SYST:
+				{
+					if(itempos == 0)
+					{
+						if(!strcmp(inputbuf,"1316"))
+						{
+							inputflag=0;
+							memset(inputbuf,0,sizeof(inputbuf));
+							pageflag = PAGE_CAL;
+							displayflag = 1;
+						}
+					}
+				}break;
+				case PAGE_CAL:
+				{
+					SN_CONFIRM();
+				}break;
 			}
+			
 		}else if(y > ZEROYCOR1 && y < ZEROYCOR2 && x > MINUSXCOR1 && x < MINUSXCOR2){
 			DISP_NUM('-');
 		}else if(y > ZEROYCOR1 && y < ZEROYCOR2 && x > DOTXCOR1 && x < DOTXCOR2){
 			DISP_NUM('.');
 		}else if(y > ZEROYCOR1 && y < ZEROYCOR2 && x > ZEROXCOR1 && x < ZEROXCOR2){
 			DISP_NUM('0');
+		}else if(y > EXITYCOR1 && y < EXITYCOR2 && x > EXITXCOR1 && x < EXITXCOR2){
+			INPUT_CANCEL();
+		}
+	}else{
+		switch(pageflag)
+		{
+			case PAGE_MEAS:
+			{
+				if(x > CHODDXCOR1 && x < CHODDXCOR2)//1357
+				{
+					if(y > CHROW1YCOR1 && y < CHROW1YCOR2)//1
+					{
+						itempos = 1;
+					}else if(y > CHROW2YCOR1 && y < CHROW2YCOR2){//3
+						itempos = 3;
+					}else if(y > CHROW3YCOR1 && y < CHROW3YCOR2){//5
+						itempos = 5;
+					}else if(y > CHROW4YCOR1 && y < CHROW4YCOR2){//6
+						itempos = 7;
+					}
+					moveflag = 1;
+				}else if(x > CHEVENXCOR1 && x < CHEVENXCOR2){//2468
+					if(y > CHROW1YCOR1 && y < CHROW1YCOR2)//2
+					{
+						itempos = 2;
+					}else if(y > CHROW2YCOR1 && y < CHROW2YCOR2){//4
+						itempos = 4;
+					}else if(y > CHROW3YCOR1 && y < CHROW3YCOR2){//5
+						itempos = 6;
+					}else if(y > CHROW4YCOR1 && y < CHROW4YCOR2){//8
+						itempos = 8;
+					}
+					moveflag = 1;
+				}
+			}break;
+			case PAGE_SETP:
+			{
+				if(x > SETODDXCOR1 && x < SETODDXCOR2)//1234
+				{
+					if(y > SETROW1YCOR1 && y < SETROW1YCOR2)//1
+					{
+						itempos = 1;
+					}else if(y > SETROW2YCOR1 && y < SETROW2YCOR2){//2
+						itempos = 2;
+					}else if(y > SETROW3YCOR1 && y < SETROW3YCOR2){//3
+						itempos = 3;
+					}else if(y > SETROW4YCOR1 && y < SETROW4YCOR2){//4
+						itempos = 4;
+					}
+					moveflag = 1;
+				}else if(x > SETEVENXCOR1 && x < SETEVENXCOR2){//5678
+					if(y > SETROW1YCOR1 && y < SETROW1YCOR2)//5
+					{
+						itempos = 5;
+					}else if(y > SETROW2YCOR1 && y < SETROW2YCOR2){//6
+						itempos = 6;
+					}else if(y > SETROW3YCOR1 && y < SETROW3YCOR2){//7
+						itempos = 7;
+					}else if(y > SETROW4YCOR1 && y < SETROW4YCOR2){//8
+						itempos = 8;
+					}
+					moveflag = 1;
+				}
+			}break;
+			case PAGE_SYST:
+			{
+				if(x > SETODDXCOR1 && x < SETODDXCOR2)//1234
+				{
+					if(y > SYSROW1YCOR1 && y < SYSROW1YCOR2)//1
+					{
+						itempos = 1;
+					}else if(y > SYSROW2YCOR1 && y < SYSROW2YCOR2){//2
+						itempos = 2;
+					}else if(y > SYSROW3YCOR1 && y < SYSROW3YCOR2){//3
+						itempos = 3;
+					}else if(y > SYSROW4YCOR1 && y < SYSROW4YCOR2){//4
+						itempos = 4;
+					}
+					moveflag = 1;
+				}else if(x > SETEVENXCOR1 && x < SETEVENXCOR2){//5678
+					if(y > SYSROW1YCOR1 && y < SYSROW1YCOR2)//5
+					{
+						itempos = 5;
+					}else if(y > SYSROW2YCOR1 && y < SYSROW2YCOR2){//6
+						itempos = 6;
+					}else if(y > SYSROW3YCOR1 && y < SYSROW3YCOR2){//7
+						itempos = 7;
+					}else if(y > SYSROW4YCOR1 && y < SYSROW4YCOR2){//8
+						itempos = 8;
+					}
+					moveflag = 1;
+				}
+			}break;
 		}
 	}
 	

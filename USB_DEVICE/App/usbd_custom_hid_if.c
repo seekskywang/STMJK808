@@ -32,7 +32,9 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+unsigned char USB_Recive_Buffer[64];
+unsigned char USB_Received_Count;
+u8 UsbHidReceiveComplete=0;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -88,8 +90,7 @@
   * @{
   */
 
-/** Usb HID report descriptor. */
-__ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
+/** Usb HID report descriptor. */__ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
   /* USER CODE BEGIN 0 */
   0x05, 0x8c, // USAGE_PAGE (ST Page) /
@@ -196,6 +197,22 @@ static int8_t CUSTOM_HID_DeInit_FS(void)
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN 6 */
+	int i;
+    /*查看接收数据长度*/
+    USB_Received_Count = USBD_GetRxCount( &hUsbDeviceFS,CUSTOM_HID_EPOUT_ADDR );  //第一参数是USB句柄，第二个参数的是接收的末端地址；要获取发送的数据长度的话就把第二个参数改为发送末端地址即可
+    //printf("USB_Received_Count = %d \r\n",USB_Received_Count);
+    
+    USBD_CUSTOM_HID_HandleTypeDef   *hhid; //定义一个指向USBD_CUSTOM_HID_HandleTypeDef结构体的指针
+    hhid = (USBD_CUSTOM_HID_HandleTypeDef*)hUsbDeviceFS.pClassData;//得到USB接收数据的储存地址
+    
+    for(i=0;i<USB_Received_Count;i++) 
+    {
+        USB_Recive_Buffer[i]=hhid->Report_buf[i];  //把接收到的数据送到自定义的缓存区保存（Report_buf[i]为USB的接收缓存区）
+    } 
+    
+  /* Start next USB packet transfer once data processing is completed */
+//  USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceFS);
+	UsbHidReceiveComplete=1;
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -207,12 +224,12 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
   * @param  len: The report length
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-/*
-static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
-{
-  return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
-}
-*/
+
+//static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
+//{
+//  return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
+//}
+
 /* USER CODE END 7 */
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */

@@ -622,36 +622,6 @@ void TFT_Draw_Point(u16 x,u8 y,u16 color)
 输出：	  无
 **************************************************************************************/
 
-void LcdPrintEn24x32(u8 code, u16 x, u16 y, u16 color,u16 bcolor)
-{
-	u8 ip=0,i,j,k;
-  do
-	{
-		if(ZK_24x32[ip].code == code)
-		{
-			LcdSetArea(x,y,x+23,y+31);
-			WriteCommand(0x2C);
-			for(i=0;i<32;i++)
-			{														
-				for(j=0;j<3;j++)
-				{
-					for(k=0;k<8;k++)
-					{
-						if(ZK_24x32[ip].ENCODE[i]&(0x80>>j))
-							 WriteData(color)//
-						
-						else
-							 WriteData(bcolor)
-					}
-				}
-			}
-			return;
-		}
-		ip++;
-	}
-	while(ZK_24x32[ip].code);
-}
-
 
 /**************************************************************************************
 函数功能：在LCD上打印一个8X16英文字符
@@ -1131,38 +1101,7 @@ void LcdPrintHz16x16(u16 code,u16 x,u16 y,u16 color,u16 bcolor)
 // 	}while(GB_324[ip].code[0] != 0 || GB_324[ip].code[1] != 0);
 // }
 
-/**************************************************************************************
-功能描述: 	在屏幕显示一个字符串
-输    入: 	char* str       字符串指针
-                u16 x,y		目标显示位置坐标
-		u16 color	字体颜色
-		u16 bcolor	背景颜色
-输    出: 	无
-**************************************************************************************/
-void Lcd_Str32(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
-{
-	u8 i;
-	u16 px;	
-	i = 0;
-	px = x;
-//	px2=x+256;
-	while(str[i])
-	{
-		if(str[i] > 0x7F)//是汉字
-		{
-			LcdPrintHz16x16((str[i]<<8)|str[i+1],px,y,color,bcolor);
-			i += 2;
-			px += 16;
-		//	px2-=16;
-		}
-		else//非汉字
-		{
-			LcdPrintEn24x32(str[i],px, y, color,bcolor);
-			i++;
-			px += 24;
-		}
-	}
-}
+
 
 void Lcd_Str16(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
 {

@@ -301,6 +301,7 @@ void proc_send_dw(int ch)
 //	 		}
 //}
 
+
 void cal_process(void)
 {
 	u8 i;
@@ -314,6 +315,7 @@ void cal_process(void)
 		}
 		dwin_print_n50_mv();
 		calflag = 0;
+		DISP_CAL_PROCESS(1);
 	}else if(calflag == 2){
 		for(i=0;i<32;i++)
 		{
@@ -325,6 +327,7 @@ void cal_process(void)
 		SaveDevPara(LinearCoeff);
 		calflag = 0;
 		Test.f_run=RUN_t;
+		DISP_CAL_PROCESS(2);
 	}else if(calflag == 3){
 		
 	}else if(calflag == 4){
@@ -443,9 +446,9 @@ tmk=Tenir*100;
 	 		}
 	 } */
 	 if(tempOVER==0)
-	 {if(SYSPAR.Dia==4)	 {adf=TempC2K(CurrentTemp[ch]);CurrentTemp[ch]=adf;}//F
+	 {if(SYSPAR.unit==2)	 {adf=TempC2K(CurrentTemp[ch]);CurrentTemp[ch]=adf;}//F
 
-	 if(SYSPAR.Dia==1)	 {adf=2731+CurrentTemp[ch];CurrentTemp[ch]=adf;}//k
+	 if(SYSPAR.unit==1)	 {adf=2731+CurrentTemp[ch];CurrentTemp[ch]=adf;}//k
 	 }
 
 //t820;

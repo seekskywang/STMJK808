@@ -38,7 +38,7 @@ typedef struct{
 #define LCD_ADJ_X (LCD_ADJX_MAX - LCD_ADJY_MIN)//读取方框的宽度
 #define LCD_ADJ_Y (LCD_ADJY_MAX - LCD_ADJY_MIN)//读取方框的高度
 
-#define TOUCH_MAX        20    //预期差值
+#define TOUCH_MAX        30    //预期差值
 #define TOUCH_READ_TIMES 5     //一次读取触摸值的次数
 #define TOUCH_Y_CMD      0xD0  //读取X轴命令
 #define TOUCH_X_CMD      0x90  //读取Y轴命令

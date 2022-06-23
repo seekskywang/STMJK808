@@ -4,7 +4,7 @@
 
 static __IO uint32_t  SPITimeout = SPIT_LONG_TIMEOUT;   
 
-static uint16_t SPI_TIMEOUT_UserCallback(uint8_t errorCode);
+//static uint16_t SPI_TIMEOUT_UserCallback(uint8_t errorCode);
 void CH376_CS1(void){	HAL_GPIO_WritePin(SPI1_NSS_GPIO_Port, SPI1_NSS_Pin, GPIO_PIN_SET);}
 void CH376_CS0(void){	HAL_GPIO_WritePin(SPI1_NSS_GPIO_Port, SPI1_NSS_Pin, GPIO_PIN_RESET);}
 /*******************************************************************************
@@ -143,15 +143,15 @@ u8 Init_CH376(void)
 	}
 }
 
-/**
-  * @brief  等待超时回调函数
-  * @param  None.
-  * @retval None.
-  */
-static  uint16_t SPI_TIMEOUT_UserCallback(uint8_t errorCode)
-{
-  /* 等待超时后的处理,输出错误信息 */
-	FLASH_ERROR("SPI 等待超时!errorCode = %d",errorCode);
-  return 0;
-}
+///**
+//  * @brief  等待超时回调函数
+//  * @param  None.
+//  * @retval None.
+//  */
+//static  uint16_t SPI_TIMEOUT_UserCallback(uint8_t errorCode)
+//{
+//  /* 等待超时后的处理,输出错误信息 */
+//	FLASH_ERROR("SPI 等待超时!errorCode = %d",errorCode);
+//  return 0;
+//}
 

@@ -45,6 +45,7 @@ extern "C" {
 #include <stdlib.h>
 #include "ch376.h"
 #include "FILESYS.h"
+//#include "usbd_customhid.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -54,6 +55,7 @@ extern struct SParameter SYSPAR;
 extern SPI_HandleTypeDef hspi3;
 extern SPI_HandleTypeDef hspi2;
 extern SPI_HandleTypeDef hspi1;
+extern TIM_HandleTypeDef htim3;
 extern struct Tes_RUN  Test;
 extern struct CalPara LinearCoeff;
 extern int16_t CurrentTemp[8];
@@ -63,8 +65,14 @@ extern RTC_DateTypeDef GetDate;  //获取日期结构体
 extern RTC_TimeTypeDef GetTime;   //获取时间结构体
 extern RTC_HandleTypeDef hrtc;
 extern u8 inputflag;
-extern int16_t TempOffset[8];
+extern RTC_DateTypeDef DateBuf;  //获取日期结构体
+extern RTC_TimeTypeDef TimeBuf;   //获取时间结构体
+//extern int16_t TempOffset[8];
 extern int16_t DispTemp[8];
+extern u8 usaveflag;
+extern char inputbuf[10];
+extern u8 autooffflag;
+extern union	UU	enir_temp;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -90,6 +98,8 @@ void SaveSysPara(struct SParameter SysPara);
 void SaveDevPara(struct  CalPara Para);
 void RdSysPara(struct SParameter *SysPara);
 void RdDevPara(struct CalPara *Para);
+void SYSPARCOMP(void);
+void SYSPARRST(void);
 void DelayUs(u32 delay_us);
 void Brightness(void);
 void ad_pro(u8 ch,u8 typ);
@@ -100,7 +110,8 @@ void DISP_INPUT(void);
 void DISP_NUM(char num);
 void DEL_NUM(void);
 void INPUT_CONFIRM(__packed int16_t *data);
-
+void SN_CONFIRM(void);
+u16 Tab_bat(u16 bat);
 u16 ReadTemperature(void);
 unsigned char DS18B20_Init(void);			//初始化DS18B20
 float DS18B20_Get_Temp(void);	//获取温度
@@ -110,6 +121,12 @@ unsigned char DS18B20_Read_Byte(void);		//读出一个字节
 unsigned char DS18B20_Read_Bit(void);		//读出一个位
 unsigned char DS18B20_Check(void);			//检测是否存在DS18B20
 void DS18B20_Rst(void);			//复位DS18B20  
+void POWER_OFF(void);
+void tmp0(void);
+void TOUCH_RESET(void);
+void RTC_Get_DateTimeCounter(RTC_DateTypeDef *sDate, RTC_TimeTypeDef *sTime);
+void SaveTime(void);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -247,7 +264,8 @@ __packed struct SParameter
   int16_t yOffset; 
   float xFactor;
   float yFactor;
-	//71+3
+	int16_t TempOffset[8];
+	//71+3+16
 //	u8 id;
 	
 //	int16_t dis_up[MAX_CHANNEL_NUM];

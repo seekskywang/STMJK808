@@ -59,7 +59,6 @@ TIM_HandleTypeDef htim3;
 SRAM_HandleTypeDef hsram1;
 
 /* USER CODE BEGIN PV */
-
 struct SParameter SYSPAR={0};
 u8 KeyNum=0,KeyFlag=1;
 u32 testdata=0x5589;
@@ -68,11 +67,32 @@ struct CalPara LinearCoeff={1,1};
 int16_t Tenir;
 u16 testcount;
 float temperature=0;
-int16_t TempOffset[8]={0};
+//int16_t TempOffset[8]={0};
 int16_t DispTemp[8];
 u8 usbstatus = UNKNOWN;
 uint16_t ADC_Value=0;
-char testbuf[8];
+u16 bat_vm,battm;
+u8 fileflag;
+u8 saveok;
+u8 usbsendbuf[0x40];
+u8 *crec;
+u8 *csend;
+uint16_t readcrc;
+const u8 speedset[3]={10,5,1};
+
+// 设置时间戳计数的基准日期
+RTC_DateTypeDef DateBase = {
+    .Year = 22,
+    .Month = 05,
+    .Date = 01,
+    .WeekDay = RTC_WEEKDAY_SUNDAY,
+};
+
+extern unsigned char USB_Recive_Buffer[64];
+extern u8 UsbHidReceiveComplete;
+extern USBD_HandleTypeDef hUsbDeviceFS;
+extern HAL_StatusTypeDef  RTC_WriteTimeCounter(RTC_HandleTypeDef *hrtc, uint32_t TimeCounter);
+extern uint32_t RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc);
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -87,7 +107,9 @@ static void MX_SPI2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-
+extern uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef *pdev,
+                                   uint8_t *report,
+                                   uint16_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,21 +134,601 @@ void DelayUs(u32 delay_us)
 	}
 }
 
+uint16_t CRC16(uint8_t *puchMsg, uint8_t Len)
+{
+	uint8_t t, m,n,p;
+	uint8_t uchCRCHi=0xFF; /* 高CRC字节初始化*/ 
+	uint8_t uchCRCLo =0xFF; /* 低CRC 字节初始化*/ 
+	for(t=0;t<Len;t++)
+	{	
+		uchCRCLo=uchCRCLo^puchMsg[t];
+		for(n=0;n<8;n++)
+		{
+			m=uchCRCLo&1;p=uchCRCHi&1;uchCRCHi>>=1;
+			uchCRCLo>>=1;
+
+			if(p)
+			{
+				uchCRCLo|=0x80;
+			}
+			if(m)	
+			{
+				uchCRCHi=uchCRCHi^0xa0;
+				uchCRCLo=uchCRCLo^1;
+			}
+		}
+	}
+	return (uchCRCHi<<8|uchCRCLo);
+}
+
+void UsbDataHandle(void)
+{
+	u8 i;
+//	u8 j;
+	uint16_t sendcrc;
+	u8 creclen;
+	u8 csendlen;
+
+//	u16 voltage;//电压
+//	u16 current;
+//	u32 power;  //功率
+//	u16 frequancy;
+//	u16 PF;//功率因数
+	
+	if(USB_Recive_Buffer[0] == 0x01)
+	{
+		if(USB_Recive_Buffer[1] == 0x03)//读数据
+		{
+			free(crec);
+			free(csend);
+			if(USB_Recive_Buffer[2] == 0 && USB_Recive_Buffer[3] == 0)
+			{
+				readcrc = USB_Recive_Buffer[4] << 8|USB_Recive_Buffer[5];
+				creclen = 4;
+				crec = (u8 *)malloc(sizeof(u8) * creclen);
+				memset(crec, 0, creclen);//初始化，每个元素都为零
+				for(i = 0;i < 4;i++)
+				{
+					crec[i] = USB_Recive_Buffer[i];
+				}
+			}else{
+				readcrc = USB_Recive_Buffer[6] << 8|USB_Recive_Buffer[7];
+				creclen = 6;
+				crec = (u8 *)malloc(sizeof(u8) * creclen);
+				memset(crec, 0, creclen);//初始化，每个元素都为零
+				for(i = 0;i < 6;i++)
+				{
+					crec[i] = USB_Recive_Buffer[i];
+				}				
+			}				
+//			crcwatch = CRC16(crec,creclen);
+			if(CRC16(crec,creclen) == readcrc)//CRC校验
+			{
+				
+				if(USB_Recive_Buffer[2] == 0 && USB_Recive_Buffer[3] == 0)//读实时数据
+				{
+					csendlen = 38;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = 0x00;
+					usbsendbuf[5] = 0x10;
+//					usbsendbuf[6] = USB_Recive_Buffer[5]*2;
+					
+//					if(usbsendbuf[5]<= 16)
+//					{
+						for(i = 0; i < usbsendbuf[5]; i++)
+						{
+							if(i<8)
+							{
+								if(CurrentTemp[i] == 0x7fff)
+								{
+									usbsendbuf[6+i*2] = 0x7F;
+									usbsendbuf[7+i*2] = 0xFF;
+								}else{
+									usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
+									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
+								}
+							}else{
+								usbsendbuf[6+i*2] = 0x7F;
+								usbsendbuf[7+i*2] = 0xFF;
+							}
+
+						}
+						for(i = 0;i < csendlen; i++)
+						{
+							csend[i] = usbsendbuf[i];
+						}
+						sendcrc = CRC16(csend,csendlen);
+						usbsendbuf[6+(usbsendbuf[5])*2] = (u8)(sendcrc >> 8);
+						usbsendbuf[7+(usbsendbuf[5])*2] = (u8)(sendcrc);
+
+						USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显						
+//					
+				}else if(USB_Recive_Buffer[2] == 0xC0 && USB_Recive_Buffer[3] == 0x00){//读取时间
+					
+					csendlen = 15;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);		
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+
+//					usbreadtime = 1;
+					
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x08;
+					usbsendbuf[7] = (u8)((2000+GetDate.Year)>>8);
+					usbsendbuf[8] = (u8)(GetDate.Year);
+					usbsendbuf[9] = (u8)(GetDate.Month);
+					usbsendbuf[10] = (u8)(GetDate.Date);
+					usbsendbuf[11] = (u8)(GetTime.Hours);
+					usbsendbuf[12] = (u8)(GetTime.Minutes);
+					usbsendbuf[13] = (u8)(GetTime.Seconds);
+					usbsendbuf[14] = 0;
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[15] = (u8)(sendcrc >> 8);
+					usbsendbuf[16] = (u8)(sendcrc);
+					for(i = 17; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					
+					DelayUs(200);
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}else if(USB_Recive_Buffer[2] == 0xC0 && USB_Recive_Buffer[3] == 0x20){//读取传感器类型
+					
+					csendlen = 47;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x28;
+					for(i=0;i<40;i++)
+					{
+						if(i < 8)
+						{
+							usbsendbuf[i+7]=SYSPAR.SensorType[0];
+						}else{
+							usbsendbuf[i+7] = 0;
+						}
+					}
+
+//					usbsendbuf[8] = TCTYPE;
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[47] = (u8)(sendcrc >> 8);
+					usbsendbuf[48] = (u8)(sendcrc);
+//					for(i = 11; i < 64 ; i++)
+//					{
+//						usbsendbuf[i] = 0;
+//					}
+					
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}else if(USB_Recive_Buffer[2] == 0xC0 && USB_Recive_Buffer[3] == 0x10){//读取仪器状态
+					
+					csendlen = 9;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x02;
+					usbsendbuf[7] = 0x00;
+					usbsendbuf[8] = 1;
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[9] = (u8)(sendcrc >> 8);
+					usbsendbuf[10] = (u8)(sendcrc);
+					for(i = 11; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}else if(USB_Recive_Buffer[2] == 0x01 && USB_Recive_Buffer[3] == 0x01){//读取上下限
+					
+					csendlen = 11;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x04;
+					usbsendbuf[7] = (u8)((int)(SYSPAR.upper) >> 8);
+					usbsendbuf[8] = (u8)((int)(SYSPAR.upper));
+					usbsendbuf[9] = (u8)((int)(SYSPAR.lower));
+					usbsendbuf[10] = (u8)((int)(SYSPAR.lower));
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[11] = (u8)(sendcrc >> 8);
+					usbsendbuf[12] = (u8)(sendcrc);
+					for(i = 13; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}else if(USB_Recive_Buffer[2] == 0x02 && USB_Recive_Buffer[3] == 0x58){//读取单位
+					free(csend);
+					csendlen = 9;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x02;
+					usbsendbuf[7] = 0x00;
+					if(SYSPAR.unit==0)
+						usbsendbuf[8] = 5;
+					else if(SYSPAR.unit==1)
+						usbsendbuf[8] = 1;
+					else if(SYSPAR.unit==2)
+						usbsendbuf[8] = 4;
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[9] = (u8)(sendcrc >> 8);
+					usbsendbuf[10] = (u8)(sendcrc);
+					for(i = 11; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}else if(USB_Recive_Buffer[2] == 0xEE && USB_Recive_Buffer[3] == 0xEE){//检测连接状态
+					
+					csendlen = 18;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x4A;
+					usbsendbuf[7] = 0x4B;
+					usbsendbuf[8] = 0x35;
+					usbsendbuf[9] = 0x30;
+					usbsendbuf[10] = 0x38;
+					usbsendbuf[11] = 0x00;
+					usbsendbuf[12] = 0x00;
+					usbsendbuf[13] = 8;
+					usbsendbuf[14] = 0x00;
+					usbsendbuf[15] = 0x00;
+					usbsendbuf[16] = 0x00;
+					usbsendbuf[17] = 0x00;
+
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[18] = (u8)(sendcrc >> 8);
+					usbsendbuf[19] = (u8)(sendcrc);
+					for(i = 20; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+					
+				}else if(USB_Recive_Buffer[2] == 0x80 && USB_Recive_Buffer[3] == 0x10){//读取电参数
+					
+					csendlen = 19;				
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					//发送数据CRC校验长度
+					
+					
+//					usbsendbuf[0] = 0x00;
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x03;
+					usbsendbuf[2] = USB_Recive_Buffer[2];
+					usbsendbuf[3] = USB_Recive_Buffer[3];
+					usbsendbuf[4] = USB_Recive_Buffer[4];
+					usbsendbuf[5] = USB_Recive_Buffer[5];
+					usbsendbuf[6] = 0x0C;
+//					usbsendbuf[7] = (u8)(voltage >> 8);
+//					usbsendbuf[8] = (u8)voltage;
+//					usbsendbuf[9] = (u8)(current >> 8);
+//					usbsendbuf[10] = (u8)current;
+//					usbsendbuf[11] = (u8)(power >> 24);
+//					usbsendbuf[12] = (u8)(power >> 16);
+//					usbsendbuf[13] = (u8)(power >> 8);
+//					usbsendbuf[14] = (u8)power;
+//					usbsendbuf[15] = (u8)(frequancy >> 8);
+//					usbsendbuf[16] = (u8)frequancy;
+//					usbsendbuf[17] = (u8)(PF >> 8);
+//					usbsendbuf[18] = (u8)PF;
+					usbsendbuf[7] = 0xFF;
+					usbsendbuf[8] = 0xFF;
+					usbsendbuf[9] = 0xFF;
+					usbsendbuf[10] = 0xFF;
+					usbsendbuf[11] = 0xFF;
+					usbsendbuf[12] = 0xFF;
+					usbsendbuf[13] = 0xFF;
+					usbsendbuf[14] = 0xFF;
+					usbsendbuf[15] = 0xFF;
+					usbsendbuf[16] = 0xFF;
+					usbsendbuf[17] = 0xFF;
+					usbsendbuf[18] = 0xFF;
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[19] = (u8)(sendcrc >> 8);
+					usbsendbuf[20] = (u8)(sendcrc);
+					
+					for(i = 21; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}
+			}
+			
+		}else if(USB_Recive_Buffer[1] == 0x10){
+			free(crec);
+			free(csend);
+			if(USB_Recive_Buffer[2] == 0xC0 && USB_Recive_Buffer[3] == 0x00)//设置时间
+			{
+				readcrc = USB_Recive_Buffer[15] << 8|USB_Recive_Buffer[16];
+				creclen = 15;
+				crec = (u8 *)malloc(sizeof(u8) * creclen);
+				memset(crec, 0, creclen);//初始化，每个元素都为零
+//				crec[0] = 0x01;
+//				crec[1] = 0x10;
+//				crec[2] = USB_Recive_Buffer[2];
+//				crec[3] = USB_Recive_Buffer[3];
+//				crec[4] = USB_Recive_Buffer[4];
+//				crec[5] = USB_Recive_Buffer[5];
+//				crec[6] = USB_Recive_Buffer[6];
+//				crec[7] = USB_Recive_Buffer[7];
+//				crec[8] = USB_Recive_Buffer[8];
+//				crec[9] = USB_Recive_Buffer[9];
+//				crec[10] = USB_Recive_Buffer[10];
+//				crec[11] = USB_Recive_Buffer[11];
+//				crec[12] = USB_Recive_Buffer[12];
+//				crec[13] = USB_Recive_Buffer[13];
+//				crec[14] = USB_Recive_Buffer[14];
+				for(i = 0; i < creclen;i ++)
+				{
+					crec[i] = USB_Recive_Buffer[i];
+				}
+				
+//				crcwatch = CRC16(crec,creclen);
+//				if(CRC16(crec,creclen) == readcrc)
+//				{
+//					csendlen = 6;
+//					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+//					memset(csend, 0, csendlen);//初始化，每个元素都为零
+//					
+//					usbsendbuf[0] = 0x01;
+//					usbsendbuf[1] = 0x10;
+//					usbsendbuf[2] = 0xC0;
+//					usbsendbuf[3] = 0x00;
+//					usbsendbuf[4] = 0x00;
+//					usbsendbuf[5] = 0x00;
+//					
+//					RTC_DateTypeDef RTC_DateStructure;
+//					RTC_TimeTypeDef RTC_TimeStructure;
+//					
+//					YEAR = USB_Recive_Buffer[8];
+//					MONTH = USB_Recive_Buffer[9];
+//					DATE = USB_Recive_Buffer[10];
+//					HOURS =USB_Recive_Buffer[11];
+//					MINUTES = USB_Recive_Buffer[12];
+//					SECONDS = USB_Recive_Buffer[13];										
+//					
+//					RTC_DateStructure.RTC_Date = DATE;
+//					RTC_DateStructure.RTC_Month = MONTH;         
+//					RTC_DateStructure.RTC_Year = YEAR;					
+//					RTC_SetDate(RTC_Format_BINorBCD, &RTC_DateStructure);
+//					RTC_WriteBackupRegister(RTC_BKP_DRX, RTC_BKP_DATA);
+//					
+//					RTC_TimeStructure.RTC_H12 = RTC_H12_AMorPM;
+//					RTC_TimeStructure.RTC_Hours = HOURS;        
+//					RTC_TimeStructure.RTC_Minutes = MINUTES;      
+//					RTC_TimeStructure.RTC_Seconds = SECONDS;      
+//					RTC_SetTime(RTC_Format_BINorBCD, &RTC_TimeStructure);
+//					RTC_WriteBackupRegister(RTC_BKP_DRX, RTC_BKP_DATA);
+//					
+//					for(i = 0;i < csendlen; i++)
+//					{
+//						csend[i] = usbsendbuf[i];
+//					}
+//					sendcrc = CRC16(csend,csendlen);
+//					usbsendbuf[6] = (u8)(sendcrc >> 8);
+//					usbsendbuf[7] = (u8)(sendcrc);
+//					
+//					for(i = 8; i < 64 ; i++)
+//					{
+//						usbsendbuf[i] = 0;
+//					}
+//					USBD_HID_SendReport(&USB_OTG_dev,usbsendbuf,64);//数据回显
+//				}
+			}else if(USB_Recive_Buffer[2] == 0x01){//设置上下限
+				readcrc = USB_Recive_Buffer[11] << 8|USB_Recive_Buffer[12];
+				creclen = 11;
+				crec = (u8 *)malloc(sizeof(u8) * creclen);
+				memset(crec, 0, creclen);//初始化，每个元素都为零
+//				crec[0] = 0x01;
+//				crec[1] = 0x10;
+//				crec[2] = USB_Recive_Buffer[2];
+//				crec[3] = USB_Recive_Buffer[3];
+//				crec[4] = USB_Recive_Buffer[4];
+//				crec[5] = USB_Recive_Buffer[5];
+//				crec[6] = USB_Recive_Buffer[6];
+//				crec[7] = USB_Recive_Buffer[7];
+//				crec[8] = USB_Recive_Buffer[8];
+//				crec[9] = USB_Recive_Buffer[9];
+//				crec[10] = USB_Recive_Buffer[10];
+				for(i = 0; i < creclen;i ++)
+				{
+					crec[i] = USB_Recive_Buffer[i];
+				}
+//				crcwatch = CRC16(crec,creclen);
+				if(CRC16(crec,creclen) == readcrc)
+				{
+					csendlen = 6;
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x10;
+					usbsendbuf[2] = 0x01;
+					usbsendbuf[3] = 0x01;
+					usbsendbuf[4] = 0x00;
+					usbsendbuf[5] = 0x02;
+					
+					SYSPAR.upper = (USB_Recive_Buffer[7] << 8 | USB_Recive_Buffer[8]);
+					SYSPAR.lower = (USB_Recive_Buffer[9] << 8 | USB_Recive_Buffer[10]);
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[6] = (u8)(sendcrc >> 8);
+					usbsendbuf[7] = (u8)(sendcrc);
+					
+					for(i = 8; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}
+			}else if(USB_Recive_Buffer[2] == 0x02 && USB_Recive_Buffer[3] == 0x58){//设置单位
+				readcrc = USB_Recive_Buffer[9] << 8|USB_Recive_Buffer[10];
+				creclen = 9;
+				crec = (u8 *)malloc(sizeof(u8) * creclen);
+				memset(crec, 0, creclen);//初始化，每个元素都为零
+//				crec[0] = 0x01;
+//				crec[1] = 0x10;
+//				crec[2] = USB_Recive_Buffer[2];
+//				crec[3] = USB_Recive_Buffer[3];
+//				crec[4] = USB_Recive_Buffer[4];
+//				crec[5] = USB_Recive_Buffer[5];
+//				crec[6] = USB_Recive_Buffer[6];
+//				crec[7] = USB_Recive_Buffer[7];
+//				crec[8] = USB_Recive_Buffer[8];
+				for(i = 0; i < creclen;i ++)
+				{
+					crec[i] = USB_Recive_Buffer[i];
+				}
+				
+//				crcwatch = CRC16(crec,creclen);
+				if(CRC16(crec,creclen) == readcrc)
+				{
+					csendlen = 6;
+					csend = (u8*)malloc(sizeof(u8) * csendlen);				
+					memset(csend, 0, csendlen);//初始化，每个元素都为零
+					usbsendbuf[0] = 0x01;
+					usbsendbuf[1] = 0x10;
+					usbsendbuf[2] = 0x02;
+					usbsendbuf[3] = 0x58;
+					usbsendbuf[4] = 0x00;
+					usbsendbuf[5] = 0x01;
+					
+					SYSPAR.unit = USB_Recive_Buffer[8];
+					
+					for(i = 0;i < csendlen; i++)
+					{
+						csend[i] = usbsendbuf[i];
+					}
+					sendcrc = CRC16(csend,csendlen);
+					usbsendbuf[6] = (u8)(sendcrc >> 8);
+					usbsendbuf[7] = (u8)(sendcrc);
+					
+					for(i = 8; i < 64 ; i++)
+					{
+						usbsendbuf[i] = 0;
+					}
+					USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, usbsendbuf, 64);//数据回显
+				}
+			}
+		}
+	}
+}
+
 void Brightness(void)
 {
 	switch(SYSPAR.brtness)
 	{
 		case 0:
 		{
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 20);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
 		}break;
 		case 1:
 		{
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 40);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 60);
 		}break;
 		case 2:
 		{
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 60);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 70);
 		}break;
 		case 3:
 		{
@@ -134,7 +736,7 @@ void Brightness(void)
 		}break;
 		case 4:
 		{
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 100);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 99);
 		}break;
 		
 		default:break;
@@ -142,18 +744,20 @@ void Brightness(void)
 	
 }
 
+
+
 u8 ScanKey(void)
 {
 	u8 key=0;
 //	 keyout(0x0);
-	 DelayUs(10);
+	 DelayUs(5);
 	 if(!HAL_GPIO_ReadPin(K1_GPIO_Port,K1_Pin))
 	 {
 			key = 1;
 	 }else if(!HAL_GPIO_ReadPin(K20_GPIO_Port,K20_Pin)){
 		 key = 20;
 	 }else if(!HAL_GPIO_ReadPin(K2_GPIO_Port,K2_Pin)){
-		 key = 2;
+			 key = 2;
 	 }else if(!HAL_GPIO_ReadPin(K3_GPIO_Port,K3_Pin)){
 		 key = 3;
 	 }else if(!HAL_GPIO_ReadPin(K4_GPIO_Port,K4_Pin)){
@@ -197,7 +801,10 @@ u8 udisk_scan(void)
 		if( res != USB_INT_SUCCESS )/* 检查U盘是否连接,等待U盘插入,对于SD卡,可以由单片机直接查询SD卡座的插拔状态引脚 */
 		{  
 //			DrawUdisk1();
+			LcdFillRec(259-10,6,267-10,19,BUTTONCOLOR);
 			usbstatus = UNCONNECTED;
+			fileflag = 0;
+			saveok=0;
 			return NO_CONNECTION;
 		}
 	}
@@ -208,6 +815,7 @@ u8 udisk_scan(void)
 		if(res == USB_INT_SUCCESS)
 		{
 //			DrawUdisk2();
+			DISP_USB();
 			usbstatus = CONNECTED;
 			return UDISK_READY;
 		}
@@ -238,6 +846,283 @@ void  BZZUER(void)
 		BuzzerOff()
 }
 
+void UDISK_SAVE(void)
+{
+	u8 buf[200];
+	u8 i;
+	static u8 filename[64];
+	static u8 TarName[64];
+	static u32 udcount;
+	saveok=0;
+
+	if(fileflag == 0)
+	{
+		fileflag = 1;
+		udcount = 0;
+		sprintf((char *)filename, "/%02d%02d%02d%02d.XLS",GetDate.Month
+											,GetDate.Date
+											,GetTime.Hours
+											,GetTime.Minutes); /* 目标文件名 */
+		strcpy((char *)TarName,(char *)filename);
+		if(CH376FileCreatePath(TarName) != USB_INT_SUCCESS)//创建文件
+		{
+			return;
+		}
+		switch(SYSPAR.SensorType[0])
+		{
+			case TYPE_T:
+			{
+				sprintf((char *)buf,"热电偶类型:T-%d",TYPE_T);
+			}break;
+			case TYPE_K:
+			{
+				sprintf((char *)buf,"热电偶类型:K-%d",TYPE_K);
+			}break;
+			case TYPE_J:
+			{
+				sprintf((char *)buf,"热电偶类型:J-%d",TYPE_J);
+			}break;
+			case TYPE_N:
+			{
+				sprintf((char *)buf,"热电偶类型:N-%d",TYPE_N);
+			}break;
+			case TYPE_E:
+			{
+				sprintf((char *)buf,"热电偶类型:E-%d",TYPE_E);
+			}break;
+			case TYPE_S:
+			{
+				sprintf((char *)buf,"热电偶类型:S-%d",TYPE_S);
+			}break;
+			case TYPE_R:
+			{
+				sprintf((char *)buf,"热电偶类型:R-%d",TYPE_R);
+			}break;
+			case TYPE_B:
+			{
+				sprintf((char *)buf,"热电偶类型:B-%d",TYPE_B);
+			}break;
+			case PT100:
+			{
+				sprintf((char *)buf,"热电偶类型:PT100-%d",PT100);
+			}break;
+		}
+		if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+		{
+			return;
+		}
+		switch(SYSPAR.unit)
+		{
+			case 0:
+			{
+				sprintf((char *)buf,"\t单位:℃-%d\n",5);
+			}break;
+			case 1:
+			{
+				sprintf((char *)buf,"\t单位:℉-%d\n",1);
+			}break;
+			case 2:
+			{
+				sprintf((char *)buf,"\t单位:K-%d\n",4);
+			}break;
+		}
+		if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+		{
+			return;
+		}
+		if(CH376ByteLocate(0xFFFFFFFF) != USB_INT_SUCCESS)
+		{
+			return;
+		}
+		sprintf((char *)buf,"\t日期\t时间\t通道1\t通道2\t通道3\t通道4\t通道5\t通道6\t通道7\t通道8");
+		if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+		{
+			return;
+		}
+		if(CH376FileClose(TRUE) != USB_INT_SUCCESS)//关闭文件
+		{
+			return;
+		}
+	}
+	delay_us(100);
+	strcpy((char *)TarName,(char *)filename);
+	if(CH376FileOpenPath(TarName) != USB_INT_SUCCESS)//打开文件
+	{
+		return;
+	}
+	if(CH376ByteLocate(0xFFFFFFFF) != USB_INT_SUCCESS)
+	{
+		return;
+	}
+	udcount++;
+	sprintf((char *)buf, "\n%d\t20%02d-%02d-%02d\t%02d:%02d:%02d"
+											,udcount
+											,GetDate.Year
+											,GetDate.Month
+											,GetDate.Date
+											,GetTime.Hours
+											,GetTime.Minutes
+											,GetTime.Seconds
+											); /* 目标文件名 */
+	if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+	{
+		return;
+	}
+	for(i=0;i<8;i++)
+	{
+
+		if(CurrentTemp[i] == 0x7fff)
+		{
+			strcpy((char *)buf,"\tN/A");
+		}else{
+			sprintf((char *)buf,"\t%.1f",((double)DispTemp[i])/10);
+		}
+		if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+		{
+			return;
+		}
+	}
+	if(CH376FileClose(TRUE) != USB_INT_SUCCESS)//关闭文件
+	{
+		return;
+	}
+	saveok=1;
+}
+ 
+//===========================================================================
+//函数名: GetDayOfMonth
+//功能  : 根据年月，获取当月的天数并返回
+//参数  : uint8_t year, uint8_t month
+//返回值: uint8_t
+//===========================================================================
+uint8_t GetDayOfMonth(uint8_t year, uint8_t month)
+{
+    uint8_t DayOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+ 
+    if (month == 2)
+    {
+        if ((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0)))
+            return 29;
+        else
+            return 28;
+    }
+    else
+        return DayOfMonth[month - 1];
+}
+
+//===========================================================================
+//函数名: GetDiffDate(uint32_t StartDate, uint32_t EndDate)
+//功能  : 计算两个日期之间的天数并返回
+//参数  : RTC_DateTypeDef StartDate, RTC_DateTypeDef EndDate
+//返回值: uint32_t
+//===========================================================================
+uint32_t GetDiffDate(RTC_DateTypeDef StartDate, RTC_DateTypeDef EndDate)
+{
+    uint32_t DayDiff = 0; // 两个日期的天数差
+ 
+    while (1)
+    {
+        if ((StartDate.Year == EndDate.Year) && (StartDate.Month == EndDate.Month))
+        {
+            DayDiff += EndDate.Date - StartDate.Date;
+            break;
+        }
+        else
+        {
+            DayDiff += EndDate.Date;
+            EndDate.Month--;
+            if (EndDate.Month == 0)
+            {
+                EndDate.Month = 12;
+                EndDate.Year--;
+            }
+            EndDate.Date = GetDayOfMonth(EndDate.Year, EndDate.Month);
+        }
+    }
+ 
+    return DayDiff;
+}
+ 
+//===========================================================================
+//函数名: CalculateDate
+//功能  : 根据起始日期和天数，计算之后的日期并返回
+//参数  : RTC_DateTypeDef FromDate, uint32_t DayDiff
+//返回值: RTC_DateTypeDef
+//===========================================================================
+RTC_DateTypeDef CalculateDate(RTC_DateTypeDef FromDate, uint32_t DayDiff)
+{
+    uint16_t day = 0;
+ 
+    while (1)
+    {
+        day = GetDayOfMonth(FromDate.Year, FromDate.Month);
+        if (FromDate.Date + DayDiff > day)
+        {
+            DayDiff -= day - FromDate.Date;
+            FromDate.Month++;
+            FromDate.Date = 0;
+ 
+            if (FromDate.Month == 13)
+            {
+                FromDate.Month = 1;
+                FromDate.Year++;
+            }
+        }
+        else
+        {
+            FromDate.Date += DayDiff;
+            break;
+        }
+    }
+ 
+    FromDate.WeekDay = DateBase.WeekDay + (DayDiff % 7);
+    if (FromDate.WeekDay >= 7)
+        FromDate.WeekDay -= 7;
+ 
+    return FromDate;
+}
+ 
+
+
+//===========================================================================
+//函数名: RTC_Set_DateTimeCounter
+//功能  : 设置RTC时间（将时间转化为时间戳保存到RTC中）
+//参数  :
+//返回值:
+//===========================================================================
+void RTC_Set_DateTimeCounter(RTC_DateTypeDef *sDate, RTC_TimeTypeDef *sTime)
+{
+    uint32_t timecounter = (uint32_t)sTime->Hours * 3600 + (uint32_t)sTime->Minutes * 60 + sTime->Seconds + GetDiffDate(DateBase, *sDate) * 3600 * 24;
+    RTC_WriteTimeCounter(&hrtc, timecounter);
+}
+
+
+//===========================================================================
+//函数名: RTC_Get_DateTimeCounter
+//功能  : 获取RTC时间（获取存储在计数器中的时间戳，再将其转化为时间）
+//参数  :
+//返回值:
+//===========================================================================
+void RTC_Get_DateTimeCounter(RTC_DateTypeDef *sDate, RTC_TimeTypeDef *sTime)
+{
+    uint32_t timecounter = RTC_ReadTimeCounter(&hrtc);
+    uint32_t SecOfToday = timecounter % (3600 * 24);
+    uint32_t DiffDay = timecounter / (3600 * 24);
+ 
+    sTime->Hours = SecOfToday / 3600;
+    sTime->Minutes = SecOfToday % 3600 / 60;
+    sTime->Seconds = SecOfToday % 60;
+ 
+    *sDate = CalculateDate(DateBase, DiffDay);
+}
+
+void SaveTime(void)
+{
+	RTC_Set_DateTimeCounter(&DateBuf, &TimeBuf);
+//  HAL_RTC_SetTime(&hrtc, &TimeBuf, RTC_FORMAT_BIN);
+//	HAL_RTC_SetDate(&hrtc, &DateBuf, RTC_FORMAT_BIN);
+//  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0x0102);
+}
 /* USER CODE END 0 */
 
 
@@ -248,7 +1133,7 @@ void  BZZUER(void)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	u8 ret,usbdect=0;
+	u8 ret,bat_c=0,usbdect=0,adcount=0,udiscount=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -290,6 +1175,7 @@ int main(void)
 //	delay_init(48);
 	RdSysPara(&SYSPAR);
 	RdDevPara(&LinearCoeff);
+	SYSPARCOMP();
 	ret=DS18B20_Init();
 	delay_ms(200);
 	BuzzerOff()
@@ -303,16 +1189,17 @@ int main(void)
 //		delay_ms(10);
 //	}
 	Init_CH376();
-	memset(TempOffset,0,sizeof(TempOffset));
 //  LcdClear(BABYYELLOW);
 	pageflag = PAGE_MEAS;
 	displayflag=1;
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+	Brightness();
 	screen_init();
+	DISP_POWERON();
 	DISP_TEST();
 	delay_ms(100);
 //	Savetest(testdata);
-//	SaveSysPara(SYSPAR);
+//	//SaveSysPara(SYSPAR);
 	Test.f_run=RUN_t;
 	KeyFlag=0;
   /* USER CODE END 2 */
@@ -324,24 +1211,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	if(ReadId() != 0x9341)
-//	{
-////	 if(para3!=0x93)
-////	 {	
-//		 
-//		
-////	 }
-//	  
-//	}
-//	LcdClear(BABYYELLOW);
-//		if(testcount == 50)
-//		{
-//			testcount=0;
-//			temperature=DS18B20_Get_Temp();
-//			b20temp = ReadTemperature();
-//		}else{
-//			testcount++;
-//		}
 		DISP_TIME();
 		if(displayflag == 1)
 		{
@@ -356,20 +1225,26 @@ int main(void)
 		
 		if(TOUCH_SCAN())
 		{
-			TOUCH_HANDLE(TouchData.lcdx,247-TouchData.lcdy);
-		}
+			TOUCH_HANDLE(TouchData.lcdx,240-TouchData.lcdy);
+		}	
 		if(KeyFlag)
 		{
 			KEY_HANDLE(KeyNum);
 		}
-		if(Test.f_run==RUN_t)
+		if(Test.f_run==RUN_t && adcount > speedset[SYSPAR.speed])
 		{
-			ad_pro(Test.ch,SYSPAR.SensorType[0]+1);
+			ad_pro(Test.ch,SYSPAR.SensorType[0]);
+			adcount=0;
+		}else{
+			adcount++;
 		}
 		if(pageflag == PAGE_MEAS)
 		{
 			DISP_TEMP();
+		}else if(pageflag == PAGE_CAL){
+			DISP_ENVIROMENT_TEMP();
 		}
+
 		if(Test.f_run==CAL_t)
 		{ 	
 	  	if(calflag != 0)
@@ -377,19 +1252,84 @@ int main(void)
 				cal_process();
 			}
 	  }
+		
 		if(usbdect==20)
 		{
 			udisk_scan();
 			usbdect=0;
-			ADC_Value=bat_get_adc();
-			sprintf(testbuf,"%d",ADC_Value);
-			Lcd_Str16((u8 *)testbuf,120,1,BABYYELLOW,BUTTONCOLOR);
 		}else{
 			usbdect++;
 		}
+		
+		if(usbstatus == CONNECTED && usaveflag == 1)
+		{
+			UDISK_SAVE();
+			usaveflag=0;
+		}
+			
+		if(saveok == 1)
+		{
+			if(udiscount > 5)
+			{
+				DISP_USB();
+			}else{
+				LcdFillRec(259-10,6,267-10,19,BUTTONCOLOR);
+			}
+			if(udiscount > 10)
+			{
+				udiscount=0;
+			}else{
+				udiscount++;
+			}
+		}
+//		bat_vm=bat_get_adc();
+		if(bat_c < 10)
+		{
+			ADC_Value+=bat_get_adc();
+			bat_c++;
+		}else{
+			bat_c=0;
+			ADC_Value/=10;
+			battm=Tab_bat(ADC_Value);
+			ADC_Value=0;
+			if(battm>100)	
+			battm=100;
+//			if(oldcharge == CHARGE_STATUS)
+//			{
+//				
+//			}else{
+				if(CHARGE_STATUS)
+				{
+					DISP_CHARGE();
+				}else{
+					DISP_BAT(battm);
+				}
+//				oldcharge=CHARGE_STATUS;
+//			}
+		}
+		
+		if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED && pageflag == PAGE_MEAS)
+		{
+			DISP_HID();
+		}else{
+			LcdFillRec(268,5,279,18,BUTTONCOLOR);
+		}
+		if(UsbHidReceiveComplete)
+		{
+			UsbDataHandle();
+			UsbHidReceiveComplete=0;
+		}
+
+		if(autooffflag==1)
+		{
+			POWER_OFF();
+		}
+//			CurrentTemp[2]=	 bat_vm;///100;
+//			CurrentTemp[3]=	bat_vm%100;
+		
 //	HAL_Delay(20);
 //	  SPI_Flash_ReadID();
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -406,11 +1346,11 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_LSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
@@ -433,7 +1373,7 @@ void SystemClock_Config(void)
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_ADC
                               |RCC_PERIPHCLK_USB;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV4;
   PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
@@ -516,30 +1456,35 @@ static void MX_RTC_Init(void)
   }
 
   /* USER CODE BEGIN Check_RTC_BKUP */
-
+	if (HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 0x0102)
+  {
   /* USER CODE END Check_RTC_BKUP */
 
   /** Initialize RTC and set the Time and Date
   */
-  sTime.Hours = 16;
-  sTime.Minutes = 30;
-  sTime.Seconds = 0;
+		sTime.Hours = 23;
+		sTime.Minutes = 59;
+		sTime.Seconds = 50;
 
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  DateToUpdate.WeekDay = RTC_WEEKDAY_THURSDAY;
-  DateToUpdate.Month = RTC_MONTH_APRIL;
-  DateToUpdate.Date = 7;
-  DateToUpdate.Year = 22;
+//		if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+//		{
+//			Error_Handler();
+//		}
+		DateToUpdate.WeekDay = RTC_WEEKDAY_SUNDAY;
+		DateToUpdate.Month = RTC_MONTH_MAY;
+		DateToUpdate.Date = 1;
+		DateToUpdate.Year = 22;
 
-  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
-  {
-    Error_Handler();
-  }
+//		if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
+//		{
+//			Error_Handler();
+//		}
   /* USER CODE BEGIN RTC_Init 2 */
-
+		// 将日期和时间换算为时间戳保存到计数器中
+    RTC_Set_DateTimeCounter(&DateToUpdate, &sTime);
+ 
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0x0102);
+	}
   /* USER CODE END RTC_Init 2 */
 
 }

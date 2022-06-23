@@ -15,6 +15,7 @@
 #define KEY_LEFT	0X09
 #define KEY_RIGT	0X0B
 #define KEY_ACC		0X07
+#define KEY_OFF		0X02
 //#define   SCREEN_HIGH	272
 //#define   SCREEN_WIDTH  480
 
@@ -125,6 +126,16 @@
 #define   DOTXCOR2      		87+30+34
 #define   ZEROXCOR1      		87+3+34*2
 #define   ZEROXCOR2      		87+30+34*2
+#define   EXITXCOR1      		225+2
+#define   EXITXCOR2      		225+62-2
+#define   CHODDXCOR1      	8+40
+#define   CHODDXCOR2      	8+40+72
+#define   CHEVENXCOR1      	168+40
+#define   CHEVENXCOR2      	168+40+72
+#define   SETODDXCOR1      	SETCOL1
+#define   SETODDXCOR2      	SETCOL1+48
+#define   SETEVENXCOR1      SETCOL2
+#define   SETEVENXCOR2      SETCOL2+48
 
 #define   NUMYCOR1      		170+2
 #define   NUMYCOR2      		170+30
@@ -134,6 +145,32 @@
 #define   CONYCOR2      		215-5+25
 #define   ZEROYCOR1      		170+34+2
 #define   ZEROYCOR2      		170+34+30
+#define   EXITYCOR1      		215-5+2
+#define   EXITYCOR2      		215-5+25
+#define   CHROW1YCOR1      	42
+#define   CHROW1YCOR2      	42+24
+#define   CHROW2YCOR1      	42+38
+#define   CHROW2YCOR2      	42+24+38
+#define   CHROW3YCOR1      	42+38*2
+#define   CHROW3YCOR2      	42+24+38*2
+#define   CHROW4YCOR1      	42+38*3
+#define   CHROW4YCOR2      	42+24+38*3
+#define   SETROW1YCOR1      SETROW1
+#define   SETROW1YCOR2      SETROW1+16
+#define   SETROW2YCOR1      SETROW1+SETROWOFFSET
+#define   SETROW2YCOR2      SETROW1+SETROWOFFSET+16
+#define   SETROW3YCOR1      SETROW1+SETROWOFFSET*2
+#define   SETROW3YCOR2      SETROW1+SETROWOFFSET*2+16
+#define   SETROW4YCOR1      SETROW1+SETROWOFFSET*3
+#define   SETROW4YCOR2      SETROW1+SETROWOFFSET*3+16
+#define   SYSROW1YCOR1      SYSROW1+SYSROWOFFSET*6
+#define   SYSROW1YCOR2      SYSROW1+SYSROWOFFSET*6+16
+#define   SYSROW2YCOR1      SYSROW1+SYSROWOFFSET*7
+#define   SYSROW2YCOR2      SYSROW1+SYSROWOFFSET*7+16
+#define   SYSROW3YCOR1      SYSROW1+SYSROWOFFSET*8
+#define   SYSROW3YCOR2      SYSROW1+SYSROWOFFSET*8+16
+#define   SYSROW4YCOR1      SYSROW1+SYSROWOFFSET*9
+#define   SYSROW4YCOR2      SYSROW1+SYSROWOFFSET*9+16
 
 extern u8 itempos;//光标位置
 extern u8 pageflag;//页面标志
@@ -148,4 +185,14 @@ void DISP_PAGE_ITEM(u8 page,u8 pos);
 void DISP_PAGE(void);
 void DISP_TIME(void);
 void DISP_TEMP(void);
+void DISP_BAT(u8 cap);
+void DISP_CHARGE(void);
+void DISP_USB(void);
+void INPUT_CANCEL(void);
+void DISP_CAL_PROCESS(u8 step);
+void DISP_ENVIROMENT_TEMP(void);//显示环境温度
+void DISP_HID(void);
+void DrawLogo(u16 x,u16 y);
+void DISP_POWERON(void);
+
 #endif

@@ -44,6 +44,8 @@
 /* USER CODE BEGIN PV */
 u8 oldkey=0,key_trg=0;
 u8 newkey=0;
+u8 usaveflag,dimflag,autooffflag;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -237,6 +239,7 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
   static u8 i;
+	static u32 ucount,dimcount,offcount;
 //  static u8 oldkey=0,key_trg=0;
 //  u8 newkey=0;
   /* USER CODE END TIM2_IRQn 0 */
@@ -260,6 +263,115 @@ void TIM2_IRQHandler(void)
 		key_trg=0;
 //		}
 		oldkey=newkey;
+	}
+	
+	if(ucount > SYSPAR.interval*1000)
+	{
+		ucount=0;
+		usaveflag = 1;
+	}else{
+		ucount++;
+	}
+	if(SYSPAR.dimtime != 4)
+	{
+		if(dimflag == 0)
+		{
+			switch(SYSPAR.dimtime)
+			{
+				case 0:
+				{
+					if(dimcount == 300*1000)
+					{
+						__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
+						dimflag=1;
+						dimcount=0;
+					}else{
+						dimcount++;
+					}
+				}break;
+				case 1:
+				{
+					if(dimcount == 600*1000)
+					{
+						__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
+						dimflag=1;
+						dimcount=0;
+					}else{
+						dimcount++;
+					}
+				}break;
+				case 2:
+				{
+					if(dimcount == 1200*1000)
+					{
+						__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
+						dimflag=1;
+						dimcount=0;
+					}else{
+						dimcount++;
+					}
+				}break;
+				case 3:
+				{
+					if(dimcount == 1800*1000)
+					{
+						__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
+						dimflag=1;
+						dimcount=0;
+					}else{
+						dimcount++;
+					}
+				}break;
+			}
+		}else if(dimflag == 1){
+			if(KeyFlag==1)
+			{
+				dimflag=0;
+				Brightness();
+			}
+		}
+	}
+	if(SYSPAR.autooff != 4)
+	{
+		switch(SYSPAR.autooff)
+			{
+				case 0:
+				{
+					if(offcount == 300*1000)
+					{
+						autooffflag=1;
+					}else{
+						offcount++;
+					}
+				}break;
+				case 1:
+				{
+					if(dimcount == 600*1000)
+					{
+						autooffflag=1;
+					}else{
+						offcount++;
+					}
+				}break;
+				case 2:
+				{
+					if(dimcount == 1200*1000)
+					{
+						autooffflag=1;
+					}else{
+						offcount++;
+					}
+				}break;
+				case 3:
+				{
+					if(dimcount == 1800*1000)
+					{
+						autooffflag=1;
+					}else{
+						offcount++;
+					}
+				}break;
+			}
 	}
   /* USER CODE END TIM2_IRQn 1 */
 }

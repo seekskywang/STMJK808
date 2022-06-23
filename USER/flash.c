@@ -84,14 +84,14 @@ void SaveSysPara(struct SParameter SysPara)
 {
 	u8 *data;
 	u32 i;
-	u8 buf[72];
+	u8 buf[90];
 	u16 *p;
 	u32 addr=EEPROM_SYS_PARA_ADDR;
 	
 	uint32_t PageError = 0;
 	
 	data = (u8 *)&SysPara;
-	for(i=0;i<74;i++) 
+	for(i=0;i<90;i++) 
 	{
 		buf[i] = *(data++);
 	}
@@ -103,7 +103,7 @@ void SaveSysPara(struct SParameter SysPara)
 	HAL_FLASH_Unlock();
 //	FLASH_PageErase(EEPROM_SYS_PARA_ADDR);
 	HAL_FLASHEx_Erase(&ferase, &PageError);
-	for(i=0;i<37;i++)
+	for(i=0;i<45;i++)
 	{
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD,addr,*p++);
 		addr+=2;
@@ -163,6 +163,95 @@ void RdDevPara(struct  CalPara *Para)
 	MemRdHalfWord(EEPROM_CAL_PARA_ADDR,data,96);
 }
 
+void SYSPARCOMP(void)
+{
+	if(SYSPAR.SensorType[0] > 9)
+	{
+		SYSPAR.SensorType[0] = 1;
+	}
+	if(SYSPAR.unit > 2)
+	{
+		SYSPAR.unit = 0;
+	}
+	if(SYSPAR.speed > 2)
+	{
+		SYSPAR.speed = 0;
+	}
+	if(SYSPAR.alarm > 1)
+	{
+		SYSPAR.alarm = 0;
+	}
+	if(SYSPAR.upper > 18000)
+	{
+		SYSPAR.upper = 18000;
+	}
+	if(SYSPAR.lower > 18000)
+	{
+		SYSPAR.lower = 18000;
+	}
+	if(SYSPAR.upper < -800)
+	{
+		SYSPAR.upper = -800;
+	}
+	if(SYSPAR.lower < -800)
+	{
+		SYSPAR.lower = -800;
+	}
+	if(SYSPAR.saveset > 1)
+	{
+		SYSPAR.saveset = 0;
+	}
+	if(SYSPAR.interval > 1000)
+	{
+		SYSPAR.interval = 1000;
+	}
+	if(SYSPAR.interval == 0)
+	{
+		SYSPAR.interval = 1;
+	}
+	if(SYSPAR.language > 1)
+	{
+		SYSPAR.language = 0;
+	}
+	if(SYSPAR.brtness > 4)
+	{
+		SYSPAR.brtness = 4;
+	}
+	if(SYSPAR.dimtime > 4)
+	{
+		SYSPAR.dimtime = 4;
+	}
+	if(SYSPAR.dimtime > 4)
+	{
+		SYSPAR.dimtime = 0;
+	}
+	if(SYSPAR.autooff > 4)
+	{
+		SYSPAR.autooff = 4;
+	}
+	if(SYSPAR.touch > 1)
+	{
+		SYSPAR.touch = 1;
+	}
+}
+
+void SYSPARRST(void)
+{
+	SYSPAR.SensorType[0]=0;
+	SYSPAR.unit=0;
+	SYSPAR.speed=0;
+	SYSPAR.upper=0;
+	SYSPAR.lower=0;
+	SYSPAR.saveset=0;
+	SYSPAR.interval=1;
+	SYSPAR.language=0;
+	SYSPAR.brtness=4;
+	SYSPAR.dimtime=4;
+	SYSPAR.offsave=0;
+	SYSPAR.autooff=4;
+	SYSPAR.touch=0;
+	memset(&SYSPAR.sn,0,8);
+}
 ////读取系统参数
 //void RdSysPara(struct SParameter *SysPara)
 //{
