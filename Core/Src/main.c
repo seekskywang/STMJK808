@@ -1233,6 +1233,7 @@ int main(void)
 		}
 		if(Test.f_run==RUN_t && adcount > speedset[SYSPAR.speed])
 		{
+//			gdtest();
 			ad_pro(Test.ch,SYSPAR.SensorType[0]);
 			adcount=0;
 		}else{
@@ -1550,7 +1551,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

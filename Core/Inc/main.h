@@ -111,6 +111,7 @@ void DISP_NUM(char num);
 void DEL_NUM(void);
 void INPUT_CONFIRM(__packed int16_t *data);
 void SN_CONFIRM(void);
+void gdtest(void);
 u16 Tab_bat(u16 bat);
 u16 ReadTemperature(void);
 unsigned char DS18B20_Init(void);			//≥ı ºªØDS18B20

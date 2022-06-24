@@ -2,7 +2,7 @@
 #include "ad.h"
 #define ADC1_DR_Address ((uint32_t)0x4001244C)
 uint8_t left_right[MAXCHN];
-
+u32 check;
 
 void dly7124(void)
 {	u8 u;
@@ -90,6 +90,14 @@ static uint32_t ad7124_regr(uint8_t reg) {
   }	AD_CS1();
   return dat;
 }
+
+void gdtest(void)
+{
+	// 检查SPI通讯是否正常
+	ad7124_regw( REG_ERR_EN, 0x180058u);
+  check = ad7124_regr(REG_ERR_EN);
+}
+
 
 void ad7124_init(void){
 		u8 i;
