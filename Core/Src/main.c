@@ -1118,6 +1118,12 @@ void RTC_Get_DateTimeCounter(RTC_DateTypeDef *sDate, RTC_TimeTypeDef *sTime)
 
 void SaveTime(void)
 {
+//	DateBuf.Year=23;
+//	DateBuf.Month=11;
+//	DateBuf.Date=2;
+//	TimeBuf.Hours=15;
+//	TimeBuf.Minutes=55;
+//	TimeBuf.Seconds=31;
 	RTC_Set_DateTimeCounter(&DateBuf, &TimeBuf);
 //  HAL_RTC_SetTime(&hrtc, &TimeBuf, RTC_FORMAT_BIN);
 //	HAL_RTC_SetDate(&hrtc, &DateBuf, RTC_FORMAT_BIN);
@@ -1213,7 +1219,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		DISP_TIME();
 		if(displayflag == 1)
-		{
+		{ 	
 			DISP_PAGE();
 			displayflag = 0;
 		}

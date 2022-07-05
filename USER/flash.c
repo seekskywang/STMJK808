@@ -203,7 +203,7 @@ void SYSPARCOMP(void)
 	}
 	if(SYSPAR.interval > 1000)
 	{
-		SYSPAR.interval = 1000;
+		SYSPAR.interval = 1;
 	}
 	if(SYSPAR.interval == 0)
 	{

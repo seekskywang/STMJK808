@@ -1107,11 +1107,11 @@ void KEY_HANDLE(u8 key)
 						{
 							if(buttonpage == 0)
 							{
-								DateBuf=GetDate;
+//								DateBuf=GetDate;
 								DateBuf.Year++;
 								moveflag = 1;
 							}else{
-								DateBuf=GetDate;
+//								DateBuf=GetDate;
 								DateBuf.Date++;
 								moveflag = 1;
 							}
@@ -1121,11 +1121,11 @@ void KEY_HANDLE(u8 key)
 						{
 							if(buttonpage == 0)
 							{
-								TimeBuf=GetTime;
+//								TimeBuf=GetTime;
 								TimeBuf.Hours++;
 								moveflag = 1;
 							}else{
-								TimeBuf=GetTime;
+//								TimeBuf=GetTime;
 								TimeBuf.Seconds++;
 								moveflag = 1;
 							}
@@ -1184,11 +1184,11 @@ void KEY_HANDLE(u8 key)
 						{
 							if(buttonpage == 0)
 							{
-								DateBuf=GetDate;
+//								DateBuf=GetDate;
 								DateBuf.Year--;
 								moveflag = 1;
 							}else{
-								DateBuf=GetDate;
+//								DateBuf=GetDate;
 								DateBuf.Date--;
 								moveflag = 1;
 							}
@@ -1198,11 +1198,11 @@ void KEY_HANDLE(u8 key)
 						{
 							if(buttonpage == 0)
 							{
-								TimeBuf=GetTime;
+//								TimeBuf=GetTime;
 								TimeBuf.Hours--;
 								moveflag = 1;
 							}else{
-								TimeBuf=GetTime;
+//								TimeBuf=GetTime;
 								TimeBuf.Seconds--;
 								moveflag = 1;
 							}
@@ -1260,14 +1260,14 @@ void KEY_HANDLE(u8 key)
 						}break;
 						case 5:
 						{
-							DateBuf=GetDate;
+//							DateBuf=GetDate;
 							DateBuf.Month++;
 							moveflag = 1;
 							SaveTime();
 						}break;
 						case 6:
 						{
-							TimeBuf=GetTime;
+//							TimeBuf=GetTime;
 							TimeBuf.Minutes++;
 							moveflag = 1;
 							SaveTime();
@@ -1310,14 +1310,14 @@ void KEY_HANDLE(u8 key)
 						}break;
 						case 5:
 						{
-							DateBuf=GetDate;
+//							DateBuf=GetDate;
 							DateBuf.Month--;
 							moveflag = 1;
 							SaveTime();
 						}break;
 						case 6:
 						{
-							TimeBuf=GetTime;
+//							TimeBuf=GetTime;
 							TimeBuf.Minutes--;
 							moveflag = 1;
 							SaveTime();
@@ -1856,7 +1856,7 @@ void INPUT_CONFIRM(__packed int16_t *data)
 
 void SN_CONFIRM(void)
 {
-	u8 i;
+//	u8 i;
 	
 	bit_flag=0;
 	inputflag=0;
@@ -2078,6 +2078,8 @@ void DISP_SYS(void)//系统设置页面固定显示
 			Lcd_Str16((u8 *)SYSSET_ITEM[i],144,22+(i+1)*18,DATACOLOR,BUTTONCOLOR);
 	}
 	Lcd_Str16((u8 *)SYSPAR.sn,144,22+2*18,DATACOLOR,BUTTONCOLOR);
+	TimeBuf=GetTime;
+	DateBuf=GetDate;
 }
 
 void DISP_CAL(void)//校准页面固定显示
@@ -2264,23 +2266,28 @@ void DISP_TIME(void)//显示时间
 //	HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
 //		/* Get the RTC current Date */
 //	HAL_RTC_GetDate(&hrtc, &GetDate, RTC_FORMAT_BIN);
-	RTC_Get_DateTimeCounter(&GetDate,&GetTime);
-	sprintf(timebuf,"%02d:%02d:%02d",GetTime.Hours,GetTime.Minutes,
-	GetTime.Seconds);
-	sprintf(datebuf,"20%02d-%02d-%02d",GetDate.Year,GetDate.Month,
-	GetDate.Date);
+	
 	switch(pageflag)
 	{
 		
 		case PAGE_MEAS:
 		{
-			
+			RTC_Get_DateTimeCounter(&GetDate,&GetTime);
+			sprintf(timebuf,"%02d:%02d:%02d",GetTime.Hours,GetTime.Minutes,
+			GetTime.Seconds);
+			sprintf(datebuf,"20%02d-%02d-%02d",GetDate.Year,GetDate.Month,
+			GetDate.Date);
 			Lcd_Str16((u8 *)timebuf,170,1,BABYYELLOW,BUTTONCOLOR);
 			
 			Lcd_Str16((u8 *)datebuf,180,192,BABYYELLOW,BUTTONCOLOR);
 		}break;
 		case PAGE_SYST:
 		{
+			RTC_Get_DateTimeCounter(&GetDate,&GetTime);
+			sprintf(timebuf,"%02d:%02d:%02d",TimeBuf.Hours,TimeBuf.Minutes,
+			TimeBuf.Seconds);
+			sprintf(datebuf,"20%02d-%02d-%02d",DateBuf.Year,DateBuf.Month,
+			DateBuf.Date);
 			if(itempos == 5)//日期
 				Lcd_Str16((u8 *)datebuf,SETCOL2,SYSROW1+SYSROWOFFSET*6,BUTTONCOLOR,BABYYELLOW);
 			else
