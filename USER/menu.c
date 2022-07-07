@@ -73,7 +73,7 @@ const char CAL_BUTTON[2][5][8]={
 	"SETUP ",
 	"SYSTEM",
 	"",
-	"复位"}
+	"RST"}
 	
 };
 
@@ -1123,10 +1123,14 @@ void KEY_HANDLE(u8 key)
 							{
 //								TimeBuf=GetTime;
 								TimeBuf.Hours++;
+								if(TimeBuf.Hours>23)
+									TimeBuf.Hours=0;
 								moveflag = 1;
 							}else{
 //								TimeBuf=GetTime;
 								TimeBuf.Seconds++;
+								if(TimeBuf.Seconds>59)
+									TimeBuf.Seconds=0;
 								moveflag = 1;
 							}
 							SaveTime();
@@ -1186,10 +1190,14 @@ void KEY_HANDLE(u8 key)
 							{
 //								DateBuf=GetDate;
 								DateBuf.Year--;
+								if(DateBuf.Year<22)
+									DateBuf.Year=22;
 								moveflag = 1;
 							}else{
 //								DateBuf=GetDate;
 								DateBuf.Date--;
+								if(DateBuf.Date<1)
+									DateBuf.Date=1;
 								moveflag = 1;
 							}
 							SaveTime();
@@ -1200,10 +1208,14 @@ void KEY_HANDLE(u8 key)
 							{
 //								TimeBuf=GetTime;
 								TimeBuf.Hours--;
+								if(TimeBuf.Hours>23)
+									TimeBuf.Hours=0;
 								moveflag = 1;
 							}else{
 //								TimeBuf=GetTime;
 								TimeBuf.Seconds--;
+								if(TimeBuf.Seconds>59)
+									TimeBuf.Seconds=0;
 								moveflag = 1;
 							}
 							SaveTime();
@@ -1262,6 +1274,8 @@ void KEY_HANDLE(u8 key)
 						{
 //							DateBuf=GetDate;
 							DateBuf.Month++;
+							if(DateBuf.Month>12)
+									DateBuf.Month=12;
 							moveflag = 1;
 							SaveTime();
 						}break;
@@ -1269,6 +1283,8 @@ void KEY_HANDLE(u8 key)
 						{
 //							TimeBuf=GetTime;
 							TimeBuf.Minutes++;
+							if(TimeBuf.Minutes>59)
+									TimeBuf.Minutes=59;
 							moveflag = 1;
 							SaveTime();
 						}break;
@@ -1312,6 +1328,8 @@ void KEY_HANDLE(u8 key)
 						{
 //							DateBuf=GetDate;
 							DateBuf.Month--;
+							if(DateBuf.Month<1)
+									DateBuf.Month=0;
 							moveflag = 1;
 							SaveTime();
 						}break;
@@ -1319,6 +1337,8 @@ void KEY_HANDLE(u8 key)
 						{
 //							TimeBuf=GetTime;
 							TimeBuf.Minutes--;
+							if(TimeBuf.Minutes>59)
+									TimeBuf.Minutes=0;
 							moveflag = 1;
 							SaveTime();
 						}break;
@@ -1683,7 +1703,10 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 				{
 					case 0:
 					{
-						Lcd_Str16((u8 *)CAL_BUTTON[SYSPAR.language][i],1+(i*70)+17,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+						if(i<4)
+							Lcd_Str16((u8 *)CAL_BUTTON[SYSPAR.language][i],1+(i*70)+17,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+						else
+							Lcd_Str16((u8 *)CAL_BUTTON[SYSPAR.language][i],1+(i*70)+17-15,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
 					}break;
 					case 1:
 					{
