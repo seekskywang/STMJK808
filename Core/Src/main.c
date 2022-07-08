@@ -70,7 +70,7 @@ float temperature=0;
 //int16_t TempOffset[8]={0};
 int16_t DispTemp[8];
 u8 usbstatus = UNKNOWN;
-uint16_t ADC_Value=0;
+uint32_t ADC_Value=0;
 u16 bat_vm,battm;
 u8 fileflag;
 u8 saveok;
@@ -79,7 +79,8 @@ u8 *crec;
 u8 *csend;
 uint16_t readcrc;
 const u8 speedset[3]={10,5,1};
-
+uint32_t ucountold;
+uint32_t ucount;
 // 设置时间戳计数的基准日期
 RTC_DateTypeDef DateBase = {
     .Year = 22,
@@ -236,7 +237,7 @@ void UsbDataHandle(void)
 									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
 								}
 							}else{
-								usbsendbuf[6+i*2] = 0x7F;
+								usbsendbuf[6+i*2] = 0xFF;
 								usbsendbuf[7+i*2] = 0xFF;
 							}
 
@@ -454,7 +455,7 @@ void UsbDataHandle(void)
 					usbsendbuf[10] = 0x38;
 					usbsendbuf[11] = 0x00;
 					usbsendbuf[12] = 0x00;
-					usbsendbuf[13] = 8;
+					usbsendbuf[13] = 0x08;
 					usbsendbuf[14] = 0x00;
 					usbsendbuf[15] = 0x00;
 					usbsendbuf[16] = 0x00;
@@ -1268,10 +1269,15 @@ int main(void)
 			usbdect++;
 		}
 		
-		if(usbstatus == CONNECTED && usaveflag == 1)
+		if(usbstatus == CONNECTED)
 		{
-			UDISK_SAVE();
-			usaveflag=0;
+			ucount=RTC_ReadTimeCounter(&hrtc);
+			if(ucount-ucountold >= SYSPAR.interval)
+			{
+				UDISK_SAVE();
+				ucountold=ucount;
+			}
+//			usaveflag=0;
 		}
 			
 		if(saveok == 1)
@@ -1290,13 +1296,13 @@ int main(void)
 			}
 		}
 //		bat_vm=bat_get_adc();
-		if(bat_c < 10)
+		if(bat_c < 100)
 		{
 			ADC_Value+=bat_get_adc();
 			bat_c++;
 		}else{
 			bat_c=0;
-			ADC_Value/=10;
+			ADC_Value/=100;
 			battm=Tab_bat(ADC_Value);
 			ADC_Value=0;
 			if(battm>100)	

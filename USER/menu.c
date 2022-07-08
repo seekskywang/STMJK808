@@ -1328,8 +1328,8 @@ void KEY_HANDLE(u8 key)
 						{
 //							DateBuf=GetDate;
 							DateBuf.Month--;
-							if(DateBuf.Month<1)
-									DateBuf.Month=0;
+							if(DateBuf.Month>12||DateBuf.Month==0)
+									DateBuf.Month=1;
 							moveflag = 1;
 							SaveTime();
 						}break;
@@ -1884,6 +1884,7 @@ void SN_CONFIRM(void)
 	bit_flag=0;
 	inputflag=0;
 	dot_flag=0;
+	memset(&SYSPAR.sn,0,10);
 	strcpy((char *)SYSPAR.sn,inputbuf);
 	memset(inputbuf,0,sizeof(inputbuf));
 	LcdClear(BUTTONCOLOR);

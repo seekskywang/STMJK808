@@ -84,14 +84,14 @@ void SaveSysPara(struct SParameter SysPara)
 {
 	u8 *data;
 	u32 i;
-	u8 buf[90];
+	u8 buf[92];
 	u16 *p;
 	u32 addr=EEPROM_SYS_PARA_ADDR;
 	
 	uint32_t PageError = 0;
 	
 	data = (u8 *)&SysPara;
-	for(i=0;i<90;i++) 
+	for(i=0;i<92;i++) 
 	{
 		buf[i] = *(data++);
 	}
@@ -103,7 +103,7 @@ void SaveSysPara(struct SParameter SysPara)
 	HAL_FLASH_Unlock();
 //	FLASH_PageErase(EEPROM_SYS_PARA_ADDR);
 	HAL_FLASHEx_Erase(&ferase, &PageError);
-	for(i=0;i<45;i++)
+	for(i=0;i<46;i++)
 	{
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD,addr,*p++);
 		addr+=2;
@@ -250,7 +250,7 @@ void SYSPARRST(void)
 	SYSPAR.offsave=0;
 	SYSPAR.autooff=4;
 	SYSPAR.touch=0;
-	memset(&SYSPAR.sn,0,8);
+	memset(&SYSPAR.sn,0,10);
 }
 ////读取系统参数
 //void RdSysPara(struct SParameter *SysPara)

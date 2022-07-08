@@ -259,14 +259,14 @@ __packed struct SParameter
 	u8 offsave;//文件
 	u8 autooff;//自动关机
 	u8 touch;//触摸屏
-	u8 sn[8];//序列号
-	//59+3
+	u8 sn[10];//序列号
+	//59+3+2
 	int16_t xOffset;
   int16_t yOffset; 
   float xFactor;
   float yFactor;
 	int16_t TempOffset[8];
-	//71+3+16
+	//71+3+16+2
 //	u8 id;
 	
 //	int16_t dis_up[MAX_CHANNEL_NUM];

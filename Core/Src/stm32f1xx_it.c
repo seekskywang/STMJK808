@@ -239,7 +239,7 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
   static u8 i;
-	static u32 ucount,dimcount,offcount;
+	static u32 /*ucount,*/dimcount,offcount;
 //  static u8 oldkey=0,key_trg=0;
 //  u8 newkey=0;
   /* USER CODE END TIM2_IRQn 0 */
@@ -265,13 +265,13 @@ void TIM2_IRQHandler(void)
 		oldkey=newkey;
 	}
 	
-	if(ucount > SYSPAR.interval*1000)
-	{
-		ucount=0;
-		usaveflag = 1;
-	}else{
-		ucount++;
-	}
+//	if(ucount > SYSPAR.interval*992)
+//	{
+//		ucount=0;
+//		usaveflag = 1;
+//	}else{
+//		ucount++;
+//	}
 	if(SYSPAR.dimtime != 4)
 	{
 		if(dimflag == 0)
