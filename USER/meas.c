@@ -419,8 +419,14 @@ tmk=Tenir*100;
 //	else
 
 	Test.ch++;
-	if(Test.ch>7)
-		Test.ch=0;
+	if(SYSPAR.version == 0)//808
+	{
+		if(Test.ch>7)
+			Test.ch=0;
+	}else{//804
+		if(Test.ch>3)
+			Test.ch=0;
+	}
 //if(Test.ch==1)Test.ch=4;	if(ch!=4)	
 	 if(tempOVER==1)
 	 {CurrentTemp[ch]=0x7fff;}	 //

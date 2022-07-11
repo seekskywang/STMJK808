@@ -21,7 +21,7 @@ char inputbuf[10];
 u8 powerondelay;
 RTC_DateTypeDef DateBuf;  //获取日期结构体
 RTC_TimeTypeDef TimeBuf;   //获取时间结构体
-
+u8 TDISPNUM[2]={8,4};
 const char TESTDISP_BUTTON[2][5][6]={
 	{"设置",
 	"系统",
@@ -63,6 +63,11 @@ const char SYSSET_BUTTON[2][5][8]={
 	
 };
 
+const char Version[2][4]={
+	"808",
+	"804",
+};
+	
 const char CAL_BUTTON[2][5][8]={
 	{"测量",
 	"设置",
@@ -319,6 +324,13 @@ const char SYSSET_ITEM[][20]={
 	"REV V1.0 Build 2000",
 };
 
+const char CAL_COMP[][6]={
+	"标准",
+	"实测",
+	"10000",
+	"900",
+};
+
 const char LANGUAGE_ITEM[][10]={
 	"中文",
 	"ENGLISH",
@@ -422,7 +434,7 @@ const char USEROFFSET_ITEM[][5]={
 	"RST"
 };
 
-const char POWERON_ITEM[][32]={
+const char POWERON_ITEM808[][32]={
 	"JK808 MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
@@ -432,6 +444,15 @@ const char POWERON_ITEM[][32]={
 	"Initializing Channel 6...",
 	"Initializing Channel 7...",
 	"Initializing Channel 8...",
+	"Done!"
+};
+
+const char POWERON_ITEM804[][32]={
+	"JK804 MULTI CHANNEL TEMP.METER",
+	"Initializing Channel 1...",
+	"Initializing Channel 2...",
+	"Initializing Channel 3...",
+	"Initializing Channel 4...",
 	"Done!"
 };
 
@@ -761,9 +782,9 @@ void KEY_HANDLE(u8 key)
 					}else{
 						itempos+=2;
 					}
-					if(itempos>8)
+					if(itempos>TDISPNUM[SYSPAR.version])
 					{
-						itempos=8;
+						itempos=TDISPNUM[SYSPAR.version];
 					}
 					moveflag = 1;
 				}break;
@@ -777,7 +798,7 @@ void KEY_HANDLE(u8 key)
 				}break;
 				case KEY_RIGT:
 				{
-					if(itempos<8)
+					if(itempos<TDISPNUM[SYSPAR.version])
 					{
 						itempos++;
 					}
@@ -1522,6 +1543,12 @@ void KEY_HANDLE(u8 key)
 						default:break;
 					}
 				}break;
+				case KEY_F4:
+				{
+					
+					SYSPAR.version=!SYSPAR.version;
+					displayflag = 1;
+				}break;
 				case KEY_F5:
 				{
 					switch(itempos)
@@ -1726,6 +1753,7 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 					}break;
 					default:break;
 				}
+				Lcd_Str16((u8 *)Version[SYSPAR.version],1+(3*70)+17,UP_LINE_OFFSET+7,TCALCOLOR,FILLBLOCK);
 			}break;
 			default:break;
 		}
@@ -1749,14 +1777,28 @@ static void DISP_CHNUM(void)//显示通道名称
 {
 	u8 i;
 	char numchar[4];
-	for(i=0;i<8;i++)
+	if(SYSPAR.version == 0)//808
 	{
-		sprintf(numchar,"%02d:",i+1);
-		if(i%2)
+		for(i=0;i<8;i++)
 		{
-			Lcd_Str16((u8 *)numchar,168,42+i/2*38,BABYYELLOW,BUTTONCOLOR);//2468
-		}else{
-			Lcd_Str16((u8 *)numchar,8,42+i/2*38,BABYYELLOW,BUTTONCOLOR);//1357
+			sprintf(numchar,"%02d:",i+1);
+			if(i%2)
+			{
+				Lcd_Str16((u8 *)numchar,168,42+i/2*38,BABYYELLOW,BUTTONCOLOR);//2468
+			}else{
+				Lcd_Str16((u8 *)numchar,8,42+i/2*38,BABYYELLOW,BUTTONCOLOR);//1357
+			}
+		}
+	}else{//804
+		for(i=0;i<4;i++)
+		{
+			sprintf(numchar,"%02d:",i+1);
+			if(i%2)
+			{
+				Lcd_Str16((u8 *)numchar,168,61+i/2*76,BABYYELLOW,BUTTONCOLOR);//24
+			}else{
+				Lcd_Str16((u8 *)numchar,8,61+i/2*76,BABYYELLOW,BUTTONCOLOR);//13
+			}
 		}
 	}
 }
@@ -1942,71 +1984,143 @@ void DISP_TEMP(void)//显示温度
 {
 	u8 i;
 	u8 compflag=0;
-	for(i=0;i<8;i++)
+	if(SYSPAR.version == 0)//808
 	{
-		if(i%2)
+		for(i=0;i<8;i++)
 		{
-			if(CurrentTemp[i] == 0x7fff)
+			if(i%2)
 			{
-				if(i+1==itempos)
-					LcdPrintStr24("------",168+40,42+i/2*38,BUTTONCOLOR,DATACOLOR);//2468);
-				else
-					LcdPrintStr24("------",168+40,42+i/2*38,DATACOLOR,BUTTONCOLOR);//2468);
-			}else{
-				DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
-				Hex_Format(DispTemp[i],1,5,0);
-				if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
+				if(CurrentTemp[i] == 0x7fff)
 				{
-					compflag=1;
 					if(i+1==itempos)
-					{
-						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,BUTTONCOLOR,TCALCOLOR);//2468);
-					}
-					else{
-						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,TCALCOLOR,BUTTONCOLOR);//2468);
-						
-					}
+						LcdPrintStr24("------",168+40,42+i/2*38,BUTTONCOLOR,DATACOLOR);//2468);
+					else
+						LcdPrintStr24("------",168+40,42+i/2*38,DATACOLOR,BUTTONCOLOR);//2468);
 				}else{
-					if(i+1==itempos)
+					DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
+					Hex_Format(DispTemp[i],1,5,0);
+					if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
 					{
-						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,BUTTONCOLOR,TOPCOLOR);//2468);
+						compflag=1;
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,BUTTONCOLOR,TCALCOLOR);//2468);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,TCALCOLOR,BUTTONCOLOR);//2468);
+							
+						}
+					}else{
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,BUTTONCOLOR,TOPCOLOR);//2468);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,TOPCOLOR,BUTTONCOLOR);//2468);
+							
+						}
 					}
-					else{
-						LcdPrintStr24((u8 *)DispBuf,168+40,42+i/2*38,TOPCOLOR,BUTTONCOLOR);//2468);
-						
+				}
+			}else{
+				if(CurrentTemp[i] == 0x7fff)
+				{
+					if(i+1==itempos)
+						LcdPrintStr24("------",8+40,42+i/2*38,BUTTONCOLOR,DATACOLOR);//1357);
+					else
+						LcdPrintStr24("------",8+40,42+i/2*38,DATACOLOR,BUTTONCOLOR);//1357);
+				}else{
+					DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
+					Hex_Format(DispTemp[i],1,5,0);
+					if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
+					{
+						compflag=1;
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,BUTTONCOLOR,TCALCOLOR);//1357);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,TCALCOLOR,BUTTONCOLOR);//1357);
+						}
+					}else{
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,BUTTONCOLOR,TOPCOLOR);//1357);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,TOPCOLOR,BUTTONCOLOR);//1357);
+						}
 					}
+					
 				}
 			}
-		}else{
-			if(CurrentTemp[i] == 0x7fff)
+		}
+	}else{//808
+		for(i=0;i<4;i++)
+		{
+			if(i%2)
 			{
-				if(i+1==itempos)
-					LcdPrintStr24("------",8+40,42+i/2*38,BUTTONCOLOR,DATACOLOR);//1357);
-				else
-					LcdPrintStr24("------",8+40,42+i/2*38,DATACOLOR,BUTTONCOLOR);//1357);
-			}else{
-				DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
-				Hex_Format(DispTemp[i],1,5,0);
-				if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
+				if(CurrentTemp[i] == 0x7fff)
 				{
-					compflag=1;
 					if(i+1==itempos)
-					{
-						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,BUTTONCOLOR,TCALCOLOR);//1357);
-					}
-					else{
-						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,TCALCOLOR,BUTTONCOLOR);//1357);
-					}
+						LcdPrintStr24("------",168+40,42+19+i/2*76,BUTTONCOLOR,DATACOLOR);//24);
+					else
+						LcdPrintStr24("------",168+40,42+19+i/2*76,DATACOLOR,BUTTONCOLOR);//24);
 				}else{
-					if(i+1==itempos)
+					DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
+					Hex_Format(DispTemp[i],1,5,0);
+					if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
 					{
-						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,BUTTONCOLOR,TOPCOLOR);//1357);
-					}
-					else{
-						LcdPrintStr24((u8 *)DispBuf,8+40,42+i/2*38,TOPCOLOR,BUTTONCOLOR);//1357);
+						compflag=1;
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+19+i/2*76,BUTTONCOLOR,TCALCOLOR);//24);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+19+i/2*76,TCALCOLOR,BUTTONCOLOR);//24);
+							
+						}
+					}else{
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+19+i/2*76,BUTTONCOLOR,TOPCOLOR);//24);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,168+40,42+19+i/2*76,TOPCOLOR,BUTTONCOLOR);//24);
+							
+						}
 					}
 				}
-				
+			}else{
+				if(CurrentTemp[i] == 0x7fff)
+				{
+					if(i+1==itempos)
+						LcdPrintStr24("------",8+40,42+19+i/2*76,BUTTONCOLOR,DATACOLOR);//13);
+					else
+						LcdPrintStr24("------",8+40,42+19+i/2*76,DATACOLOR,BUTTONCOLOR);//13);
+				}else{
+					DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
+					Hex_Format(DispTemp[i],1,5,0);
+					if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
+					{
+						compflag=1;
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+19+i/2*76,BUTTONCOLOR,TCALCOLOR);//13);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+19+i/2*76,TCALCOLOR,BUTTONCOLOR);//13);
+						}
+					}else{
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+19+i/2*76,BUTTONCOLOR,TOPCOLOR);//13);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,8+40,42+19+i/2*76,TOPCOLOR,BUTTONCOLOR);//13);
+						}
+					}
+					
+				}
 			}
 		}
 	}
@@ -2049,8 +2163,13 @@ void DISP_TEST(void)//测量显示页面固定显示
 	DISP_CHNUM();
 	for(i=0;i<5;i++)
 	{	
-		LcdPrintHorz(1,30+38*i,319,DATACOLOR);		//横线
-		
+		if(SYSPAR.version == 1)
+		{
+			if(i%2 == 0)
+				LcdPrintHorz(1,30+38*i,319,DATACOLOR);		//804横线
+		}else{
+			LcdPrintHorz(1,30+38*i,319,DATACOLOR);		//808横线
+		}	
 	}
 	for(i=0;i<3;i++)
 	{
@@ -2111,7 +2230,10 @@ void DISP_CAL(void)//校准页面固定显示
 	itempos=0;
 	LcdClear(BUTTONCOLOR);
 	DISP_TOP(PAGE_CAL);
-
+	Lcd_Str16((u8 *)CAL_COMP[0],200,SETROW1,DATACOLOR,BUTTONCOLOR);
+	Lcd_Str16((u8 *)CAL_COMP[1],200+50,SETROW1,DATACOLOR,BUTTONCOLOR);
+	Lcd_Str16((u8 *)CAL_COMP[2],200,SETROW1,BABYYELLOW,BUTTONCOLOR);
+	Lcd_Str16((u8 *)CAL_COMP[3],200,SETROW1+SETROWOFFSET,BABYYELLOW,BUTTONCOLOR);
 }
 
 //显示页面可选项
@@ -2220,6 +2342,10 @@ void DISP_PAGE_ITEM(u8 page,u8 pos)
 		}break;
 		case PAGE_CAL:
 		{
+			Hex_Format(LinearCoeff.JKT_[0].Ks,0,5,0);
+			Lcd_Str16((u8 *)DispBuf,200+50,SETROW1,TOPCOLOR,BUTTONCOLOR);
+			Hex_Format(LinearCoeff.JKT_[0].Bt,0,4,0);
+			Lcd_Str16((u8 *)DispBuf,200+50,SETROW1+SETROWOFFSET,TOPCOLOR,BUTTONCOLOR);
 			if(itempos == 1)//-50mV
 			{
 				Lcd_Str16((u8 *)CAL_ITEM[0],SETCOL1,SETROW1,BUTTONCOLOR,BABYYELLOW);
@@ -2933,9 +3059,18 @@ void DISP_POWERON(void)
 	DrawLogo(50,150);
 	delay_ms(800);
 	LcdClear(BUTTONCOLOR);
-	for(i=0;i<10;i++)
+	if(SYSPAR.version == 0)
 	{
-		Lcd_Str16((u8 *)POWERON_ITEM[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
-		DelayMs(200);
+		for(i=0;i<10;i++)
+		{
+			Lcd_Str16((u8 *)POWERON_ITEM808[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
+			DelayMs(200);
+		}
+	}else{
+		for(i=0;i<6;i++)
+		{
+			Lcd_Str16((u8 *)POWERON_ITEM804[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
+			DelayMs(200);
+		}
 	}
 }

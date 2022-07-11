@@ -266,7 +266,9 @@ __packed struct SParameter
   float xFactor;
   float yFactor;
 	int16_t TempOffset[8];
-	//71+3+16+2
+	u8 version;//°æ±¾:0-808;1-804
+	u8 jkflag;//logo
+	//71+3+16+2+2
 //	u8 id;
 	
 //	int16_t dis_up[MAX_CHANNEL_NUM];

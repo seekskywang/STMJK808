@@ -208,7 +208,7 @@ void UsbDataHandle(void)
 				
 				if(USB_Recive_Buffer[2] == 0 && USB_Recive_Buffer[3] == 0)//读实时数据
 				{
-					csendlen = 38;				
+					csendlen = 22;				
 					csend = (u8*)malloc(sizeof(u8) * csendlen);				
 					memset(csend, 0, csendlen);//初始化，每个元素都为零
 					//发送数据CRC校验长度
@@ -219,15 +219,18 @@ void UsbDataHandle(void)
 					usbsendbuf[2] = USB_Recive_Buffer[2];
 					usbsendbuf[3] = USB_Recive_Buffer[3];
 					usbsendbuf[4] = 0x00;
-					usbsendbuf[5] = 0x10;
+					if(SYSPAR.version == 0)
+						usbsendbuf[5] = 0x08;
+					else
+						usbsendbuf[5] = 0x04;
 //					usbsendbuf[6] = USB_Recive_Buffer[5]*2;
 					
 //					if(usbsendbuf[5]<= 16)
 //					{
 						for(i = 0; i < usbsendbuf[5]; i++)
 						{
-							if(i<8)
-							{
+//							if(i<8)
+//							{
 								if(CurrentTemp[i] == 0x7fff)
 								{
 									usbsendbuf[6+i*2] = 0x7F;
@@ -236,10 +239,10 @@ void UsbDataHandle(void)
 									usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
 									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
 								}
-							}else{
-								usbsendbuf[6+i*2] = 0xFF;
-								usbsendbuf[7+i*2] = 0xFF;
-							}
+//							}else{
+//								usbsendbuf[6+i*2] = 0xFF;
+//								usbsendbuf[7+i*2] = 0xFF;
+//							}
 
 						}
 						for(i = 0;i < csendlen; i++)
@@ -450,9 +453,12 @@ void UsbDataHandle(void)
 					usbsendbuf[5] = USB_Recive_Buffer[5];
 					usbsendbuf[6] = 0x4A;
 					usbsendbuf[7] = 0x4B;
-					usbsendbuf[8] = 0x35;
+					usbsendbuf[8] = 0x38;
 					usbsendbuf[9] = 0x30;
-					usbsendbuf[10] = 0x38;
+					if(SYSPAR.version == 0)
+						usbsendbuf[10] = 0x38;
+					else
+						usbsendbuf[10] = 0x34;		
 					usbsendbuf[11] = 0x00;
 					usbsendbuf[12] = 0x00;
 					usbsendbuf[13] = 0x08;
@@ -1563,7 +1569,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

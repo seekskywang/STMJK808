@@ -84,14 +84,14 @@ void SaveSysPara(struct SParameter SysPara)
 {
 	u8 *data;
 	u32 i;
-	u8 buf[92];
+	u8 buf[94];
 	u16 *p;
 	u32 addr=EEPROM_SYS_PARA_ADDR;
 	
 	uint32_t PageError = 0;
 	
 	data = (u8 *)&SysPara;
-	for(i=0;i<92;i++) 
+	for(i=0;i<94;i++) 
 	{
 		buf[i] = *(data++);
 	}
@@ -103,7 +103,7 @@ void SaveSysPara(struct SParameter SysPara)
 	HAL_FLASH_Unlock();
 //	FLASH_PageErase(EEPROM_SYS_PARA_ADDR);
 	HAL_FLASHEx_Erase(&ferase, &PageError);
-	for(i=0;i<46;i++)
+	for(i=0;i<47;i++)
 	{
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD,addr,*p++);
 		addr+=2;
@@ -232,6 +232,14 @@ void SYSPARCOMP(void)
 	if(SYSPAR.touch > 1)
 	{
 		SYSPAR.touch = 1;
+	}
+	if(SYSPAR.version > 1)
+	{
+		SYSPAR.version = 0;
+	}
+	if(SYSPAR.jkflag > 1)
+	{
+		SYSPAR.jkflag = 0;
 	}
 }
 
