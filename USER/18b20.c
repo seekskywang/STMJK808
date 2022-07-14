@@ -423,7 +423,7 @@ void tmp0(void)
 	DS18B20_Write_Byte(0X44);				/* 开始转换 */
 	
 	//等待温度转换完成
-  while(DS18B20_Read_Byte()!=0xFF){}
+//  while(DS18B20_Read_Byte()!=0xFF){}
 					
 	DS18B20_Rst();
   DS18B20_Presence();

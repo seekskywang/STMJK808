@@ -461,7 +461,7 @@ tmk=Tenir*100;
 		if(typ<PT100)	Test.tmp820++;
 		else			Test.tmp820=0;
 
-	   if(Test.ad_bat<18){Test.tmp820=1;}// Tenir=10;
+//	   if(Test.ad_bat<18){Test.tmp820=1;}// Tenir=10;
 		//   Test.ad_bat++;
 		 //  if(Test.ad_bat>18)Test.ad_bat=20;
 	if(Test.tmp820%15==1)//||Test.tmp820<5

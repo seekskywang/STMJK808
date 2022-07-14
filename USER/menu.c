@@ -2135,7 +2135,7 @@ void DISP_TEMP(void)//显示温度
 
 void DISP_ENVIROMENT_TEMP(void)//显示环境温度
 {
-	tmp0();
+//	tmp0();
 	Hex_Format(enir_temp.adx,1,5,0);
 	Lcd_Str16((u8 *)DispBuf,100,2,TOPCOLOR,BUTTONCOLOR);
 }
