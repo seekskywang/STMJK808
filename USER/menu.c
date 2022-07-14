@@ -817,6 +817,7 @@ void KEY_HANDLE(u8 key)
 				}break;
 				case KEY_ACC:
 				{
+					
 //					gdtest();
 //					memset(&SYSPAR,0,sizeof(SYSPAR));
 				}break;

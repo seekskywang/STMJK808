@@ -7,7 +7,7 @@ void DS18B20_Mode_Out_PP(void)
     GPIO_InitTypeDef myGPIO_InitStruct;
     myGPIO_InitStruct.Pin = temperature_Pin;
     myGPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    myGPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    myGPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(temperature_GPIO_Port, &myGPIO_InitStruct);
 }
 
@@ -17,7 +17,7 @@ void DS18B20_Mode_IPU(void)
     myGPIO_InitStruct.Pin = temperature_Pin;
     myGPIO_InitStruct.Pull = GPIO_PULLUP;
     myGPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    myGPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    myGPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(temperature_GPIO_Port, &myGPIO_InitStruct);
 }
 
@@ -109,13 +109,31 @@ uint8_t DS18B20_Read_Bit(void)
  */
 uint8_t DS18B20_Read_Byte(void)
 {
-	uint8_t i, j, dat = 0;	
-	
-	for(i=0; i<8; i++) 
+	uint8_t i , dat = 0;	
+	 for(i=0;i<8;i++)
 	{
-		j = DS18B20_Read_Bit();		
-		dat = (dat) | (j<<i);
+			DS18B20_Mode_Out_PP();//初始化为输出模式
+			DS18B20_DQ_OUT_0;  
+			delay_us(2);  //主机拉低总线读数据时间隙2us        
+			DS18B20_DQ_OUT_1; //释放总线，准备读取位数据
+			DS18B20_Mode_IPU(); //初始化为输入模式
+			delay_us(10); //等待DS18B20的数据输出
+			dat >>=1 ;  //高位补0，默认以0为准
+			
+			if(DS18B20_DQ_IN){
+					dat |=0x80; //eB这里注意下,看看对不对
+			}
+			
+			
+			delay_us(60); //延时确保DS18B20采样周期已经过去（非常重要）
+//        DS18B20_OUT_SET;  //释放总线准备读取下一位位数据
 	}
+
+//	for(i=0; i<8; i++) 
+//	{
+//		j = DS18B20_Read_Bit();		
+//		dat = (dat) | (j<<i);
+//	}
 	
 	return dat;
 }
@@ -128,6 +146,20 @@ void DS18B20_Write_Byte(uint8_t dat)
 	uint8_t i, testb;
 	DS18B20_Mode_Out_PP();
 	
+//	for(i=0;i<8;i++)
+//	{
+//			DS18B20_DQ_OUT_0;
+//			delay_us(2);     //主机拉低总线写数据时间隙2us
+//			if(dat&0x01){    //如果该写入位为1，必须在15us之内把总线拉高，为0 保持60us即可。
+//					DS18B20_DQ_OUT_1;
+//			}else{
+//					DS18B20_DQ_OUT_0;
+//			}
+//			delay_us(60);
+//			DS18B20_DQ_OUT_0;  //一位发送完成
+//			dat >>=1;
+//			delay_us(2);     //位间隙2us
+//	}
 	for( i=0; i<8; i++ )
 	{
 		testb = dat&0x01;
@@ -137,10 +169,10 @@ void DS18B20_Write_Byte(uint8_t dat)
 		{			
 			DS18B20_DQ_OUT_0;
 			/* 1us < 这个延时 < 15us */
-			delay_us(8);
+			delay_us(2);
 			
 			DS18B20_DQ_OUT_1;
-			delay_us(58);
+			delay_us(60);
 		}		
 		else
 		{			
@@ -384,12 +416,15 @@ u16 ReadTemperature(void)
 extern uint8_t outad[]; 
 void tmp0(void)
 {	  
-	
+//	__disable_irq();
 	DS18B20_Rst();	   
 	DS18B20_Presence();	 
 	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
 	DS18B20_Write_Byte(0X44);				/* 开始转换 */
 	
+	//等待温度转换完成
+  while(DS18B20_Read_Byte()!=0xFF){}
+					
 	DS18B20_Rst();
   DS18B20_Presence();
 	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
@@ -400,7 +435,7 @@ void tmp0(void)
 	enir_temp.bx[1]=DS18B20_Read_Byte();
 	enir_temp.adx*=5;
 	enir_temp.adx>>=3;
-
+//	__enable_irq();
 }
 
 ////******函数功能：初始化ADC一个通道,具体是哪个通道由函数：Get_myAdc()确定

@@ -81,6 +81,12 @@ uint16_t readcrc;
 const u8 speedset[3]={10,5,1};
 uint32_t ucountold;
 uint32_t ucount;
+u8 oldkey=0,key_trg=0;
+u8 newkey=0;
+u8 sdstatus;
+u8 testres;
+u8 teststatus;
+u32 sdsize;
 // 设置时间戳计数的基准日期
 RTC_DateTypeDef DateBase = {
     .Year = 22,
@@ -1224,6 +1230,22 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		
+		newkey=ScanKey();
+		if(newkey!=oldkey) 
+			key_trg=1;
+//		else 
+//		{
+		if(key_trg==1) 
+		{
+			KeyNum=newkey;
+			if(KeyNum != 0)	
+				KeyFlag=1;
+		}
+		key_trg=0;
+//		}
+		oldkey=newkey;
+		
 		DISP_TIME();
 		if(displayflag == 1)
 		{ 	
@@ -1266,39 +1288,56 @@ int main(void)
 				cal_process();
 			}
 	  }
-		
-		if(usbdect==20)
+		if(SYSPAR.saveset == 0)//U盘
 		{
-			udisk_scan();
-			usbdect=0;
-		}else{
-			usbdect++;
-		}
-		
-		if(usbstatus == CONNECTED)
-		{
-			ucount=RTC_ReadTimeCounter(&hrtc);
-			if(ucount-ucountold >= SYSPAR.interval)
+			if(usbdect==20)
 			{
-				UDISK_SAVE();
-				ucountold=ucount;
+				udisk_scan();
+				usbdect=0;
+			}else{
+				usbdect++;
 			}
-//			usaveflag=0;
-		}
 			
-		if(saveok == 1)
-		{
-			if(udiscount > 5)
+			if(usbstatus == CONNECTED)
 			{
-				DISP_USB();
-			}else{
-				LcdFillRec(259-10,6,267-10,19,BUTTONCOLOR);
+				ucount=RTC_ReadTimeCounter(&hrtc);
+				if(ucount-ucountold >= SYSPAR.interval)
+				{
+					UDISK_SAVE();
+					ucountold=ucount;
+				}
+	//			usaveflag=0;
 			}
-			if(udiscount > 10)
+				
+			if(saveok == 1)
 			{
-				udiscount=0;
-			}else{
-				udiscount++;
+				if(udiscount > 5)
+				{
+					DISP_USB();
+				}else{
+					LcdFillRec(259-10,6,267-10,19,BUTTONCOLOR);
+				}
+				if(udiscount > 10)
+				{
+					udiscount=0;
+				}else{
+					udiscount++;
+				}
+			}
+		}else if(SYSPAR.saveset == 1){//SD卡
+			sdstatus = HAL_GPIO_ReadPin(SD_CON_GPIO_Port,SD_CON_Pin);
+			testres = CH376DiskMount();
+//			teststatus=CH376DiskQuery(&sdsize);
+			if(!HAL_GPIO_ReadPin(SD_CON_GPIO_Port,SD_CON_Pin))//识别到SD卡
+			{
+				
+				ucount=RTC_ReadTimeCounter(&hrtc);
+				if(ucount-ucountold >= SYSPAR.interval)
+				{
+					teststatus = CH376FileCreate("test.txt");
+//					UDISK_SAVE();
+					ucountold=ucount;
+				}
 			}
 		}
 //		bat_vm=bat_get_adc();
@@ -1788,6 +1827,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+	/*Configure GPIO pins : SD_CON_Pin PEN_Pin */
+  GPIO_InitStruct.Pin = SD_CON_Pin|PEN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	
   /*Configure GPIO pins : LCD_RST_Pin SPI3CS_Pin */
   GPIO_InitStruct.Pin = LCD_RST_Pin|SPI3CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;

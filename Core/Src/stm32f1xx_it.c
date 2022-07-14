@@ -42,8 +42,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-u8 oldkey=0,key_trg=0;
-u8 newkey=0;
+//u8 oldkey=0,key_trg=0;
+//u8 newkey=0;
 u8 usaveflag,dimflag,autooffflag;
 
 /* USER CODE END PV */
@@ -238,32 +238,32 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
-  static u8 i;
+//  static u8 i;
 	static u32 /*ucount,*/dimcount,offcount;
 //  static u8 oldkey=0,key_trg=0;
 //  u8 newkey=0;
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
-  i++;
-	if(i>=40)
-	{//tflg++;
-		i=0;
-		newkey=ScanKey();
-		if(newkey!=oldkey) 
-			key_trg=1;
-//		else 
+//  i++;
+//	if(i>=40)
+//	{//tflg++;
+//		i=0;
+//		newkey=ScanKey();
+//		if(newkey!=oldkey) 
+//			key_trg=1;
+////		else 
+////		{
+//		if(key_trg==1) 
 //		{
-		if(key_trg==1) 
-		{
-			KeyNum=newkey;
-			if(KeyNum != 0)	
-				KeyFlag=1;
-		}
-		key_trg=0;
+//			KeyNum=newkey;
+//			if(KeyNum != 0)	
+//				KeyFlag=1;
 //		}
-		oldkey=newkey;
-	}
+//		key_trg=0;
+////		}
+//		oldkey=newkey;
+//	}
 	
 //	if(ucount > SYSPAR.interval*992)
 //	{

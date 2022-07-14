@@ -128,7 +128,12 @@ u8 Init_CH376(void)
 //		return(CH376OK);
 //	}
 	xWriteCH376Cmd( CMD11_SET_USB_MODE ); /* 设备USB工作模式 */
-	xWriteCH376Data( 0x06 );
+	if(SYSPAR.saveset == 0)
+	{
+		xWriteCH376Data( 0x06 );//U盘
+	}else if(SYSPAR.saveset == 1){
+		xWriteCH376Data( 0x03 );//SD卡
+	}	
 	delay_us(20);
 	res = xReadCH376Data();
 	xEndCH376Cmd();

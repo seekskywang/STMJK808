@@ -195,6 +195,8 @@ void SaveTime(void);
 #define K2_GPIO_Port GPIOB
 #define K10_Pin GPIO_PIN_9
 #define K10_GPIO_Port GPIOB
+#define SD_CON_Pin GPIO_PIN_1
+#define SD_CON_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 #define temperature_Pin GPIO_PIN_7
 #define temperature_GPIO_Port GPIOC
