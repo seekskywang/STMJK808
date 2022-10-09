@@ -192,6 +192,7 @@ void INPUT_CANCEL(void);
 void DISP_CAL_PROCESS(u8 step);
 void DISP_ENVIROMENT_TEMP(void);//显示环境温度
 void DISP_HID(void);
+void DISP_SD(void);
 void DrawLogo(u16 x,u16 y);
 void DISP_POWERON(void);
 

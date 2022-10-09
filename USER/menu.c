@@ -817,7 +817,8 @@ void KEY_HANDLE(u8 key)
 				}break;
 				case KEY_ACC:
 				{
-					
+//					testres = CH376DiskMount();
+//					teststatus = CH376FileCreate("test.txt");
 //					gdtest();
 //					memset(&SYSPAR,0,sizeof(SYSPAR));
 				}break;
@@ -2055,19 +2056,19 @@ void DISP_TEMP(void)//显示温度
 				}
 			}
 		}
-	}else{//808
+	}else{//804
 		for(i=0;i<4;i++)
 		{
 			if(i%2)
 			{
-				if(CurrentTemp[i] == 0x7fff)
+				if(CurrentTemp[i*2] == 0x7fff)
 				{
 					if(i+1==itempos)
 						LcdPrintStr24("------",168+40,42+19+i/2*76,BUTTONCOLOR,DATACOLOR);//24);
 					else
 						LcdPrintStr24("------",168+40,42+19+i/2*76,DATACOLOR,BUTTONCOLOR);//24);
 				}else{
-					DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
+					DispTemp[i]=CurrentTemp[i*2]+SYSPAR.TempOffset[i];
 					Hex_Format(DispTemp[i],1,5,0);
 					if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
 					{
@@ -2092,14 +2093,14 @@ void DISP_TEMP(void)//显示温度
 					}
 				}
 			}else{
-				if(CurrentTemp[i] == 0x7fff)
+				if(CurrentTemp[i*2] == 0x7fff)
 				{
 					if(i+1==itempos)
 						LcdPrintStr24("------",8+40,42+19+i/2*76,BUTTONCOLOR,DATACOLOR);//13);
 					else
 						LcdPrintStr24("------",8+40,42+19+i/2*76,DATACOLOR,BUTTONCOLOR);//13);
 				}else{
-					DispTemp[i]=CurrentTemp[i]+SYSPAR.TempOffset[i];
+					DispTemp[i]=CurrentTemp[i*2]+SYSPAR.TempOffset[i];
 					Hex_Format(DispTemp[i],1,5,0);
 					if(DispTemp[i] > SYSPAR.upper || DispTemp[i] < SYSPAR.lower)
 					{
@@ -2161,7 +2162,7 @@ void DISP_TEST(void)//测量显示页面固定显示
 	DISP_TOP(PAGE_MEAS);
 	DISP_TCTYPE();
 	DISP_UNIT();
-	DISP_CHNUM();
+	DISP_CHNUM(); 
 	for(i=0;i<5;i++)
 	{	
 		if(SYSPAR.version == 1)
@@ -2458,17 +2459,17 @@ void DISP_TIME(void)//显示时间
 
 void DISP_BAT(u8 cap)
 {
-	LcdFillRec(300,2,310,20,BUTTONCOLOR);
-	LcdFillRec(303,2,307,5,TOPCOLOR);
-	LcdPrintRec(300,5,310,20,TOPCOLOR);
-	LcdFillRec(301,6,309,19,TOPCOLOR);
+	LcdFillRec(300+10,2,310+10,20,BUTTONCOLOR);
+	LcdFillRec(303+10,2,307+10,5,TOPCOLOR);
+	LcdPrintRec(300+10,5,310+10,20,TOPCOLOR);
+	LcdFillRec(301+10,6,309+10,19,TOPCOLOR);
 	if(cap < 25)
 	{
-		LcdFillRec(301,6,309,15,BUTTONCOLOR);
+		LcdFillRec(301+10,6,309+10,15,BUTTONCOLOR);
 	}else if(cap >=25 && cap < 50){
-		LcdFillRec(301,6,309,12,BUTTONCOLOR);
+		LcdFillRec(301+10,6,309+10,12,BUTTONCOLOR);
 	}else if(cap >=50 && cap < 75){
-		LcdFillRec(301,6,309,9,BUTTONCOLOR);
+		LcdFillRec(301+10,6,309+10,9,BUTTONCOLOR);
 	}else if(cap >=75){
 		
 	}
@@ -2477,14 +2478,14 @@ void DISP_BAT(u8 cap)
 
 void DISP_CHARGE(void)//充电图标
 {
-	LcdFillRec(300,2,310,20,BUTTONCOLOR);
-	LcdPrintVert(303,2,5,TOPCOLOR);
-	LcdPrintVert(303+4,2,5,TOPCOLOR);
-	LcdPrintHorz(300,7,11,TOPCOLOR);
-	LcdFillRec(302,8,308,15,TOPCOLOR);
-	LcdPrintHorz(303,16,5,TOPCOLOR);
-	LcdPrintHorz(304,17,3,TOPCOLOR);
-	LcdPrintVert(305,17,4,TOPCOLOR);
+	LcdFillRec(300+10,2,310+10,20,BUTTONCOLOR);
+	LcdPrintVert(303+10,2,5,TOPCOLOR);
+	LcdPrintVert(303+4+10,2,5,TOPCOLOR);
+	LcdPrintHorz(300+10,7,11,TOPCOLOR);
+	LcdFillRec(302+10,8,308+10,15,TOPCOLOR);
+	LcdPrintHorz(303+10,16,5,TOPCOLOR);
+	LcdPrintHorz(304+10,17,3,TOPCOLOR);
+	LcdPrintVert(305+10,17,4,TOPCOLOR);
 	
 }
 
@@ -2511,6 +2512,19 @@ void DISP_HID(void)//上位机通讯图标
 	LcdPrintHorz(275-1,15+2,4,TOPCOLOR);
 	LcdPrintHorz(275,15+3,2,TOPCOLOR);
 	
+}
+
+void DISP_SD(void)//SD卡图标
+{
+	LcdFillRec(290,9,296,18,BABYBLUE);
+	
+	LcdPrintHorz(290+1,8,6,BABYBLUE);
+	LcdPrintHorz(290+2,7,5,BABYBLUE);
+	LcdPrintVert(291,9,2,BUTTONCOLOR);
+	LcdPrintVert(293,8,3,BUTTONCOLOR);
+	LcdPrintVert(295,8,3,BUTTONCOLOR);
+//	LcdPrintHorz(262-10,19,3,ORANGE);
+//	LcdPrintHorz(263,20,2,TOPCOLOR);
 }
 
 void DrawLogo(u16 x,u16 y)
@@ -3064,14 +3078,25 @@ void DISP_POWERON(void)
 	{
 		for(i=0;i<10;i++)
 		{
+			if(i>0&&i<9)
+			{
+				InitPro(i-1,SYSPAR.SensorType[0]);
+			}
 			Lcd_Str16((u8 *)POWERON_ITEM808[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
 			DelayMs(200);
 		}
 	}else{
 		for(i=0;i<6;i++)
 		{
+			if(i>0&&i<5)
+			{
+				InitPro((i-1)*2,SYSPAR.SensorType[0]);
+			}else{
+				ds18b20init();
+			}
 			Lcd_Str16((u8 *)POWERON_ITEM804[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
 			DelayMs(200);
 		}
+		ds18b20init();
 	}
 }

@@ -418,13 +418,15 @@ tmk=Tenir*100;
 //	if(ch==1)	Test.ch=5;
 //	else
 
-	Test.ch++;
+	
 	if(SYSPAR.version == 0)//808
 	{
+		Test.ch++;
 		if(Test.ch>7)
 			Test.ch=0;
 	}else{//804
-		if(Test.ch>3)
+		Test.ch+=2;
+		if(Test.ch>7)
 			Test.ch=0;
 	}
 //if(Test.ch==1)Test.ch=4;	if(ch!=4)	
@@ -464,13 +466,10 @@ tmk=Tenir*100;
 //	   if(Test.ad_bat<18){Test.tmp820=1;}// Tenir=10;
 		//   Test.ad_bat++;
 		 //  if(Test.ad_bat>18)Test.ad_bat=20;
-	if(Test.tmp820%15==1)//||Test.tmp820<5
-		  {
+	if(Test.tmp820%7==1)//||Test.tmp820<5
+	{
 		  tmp0();
-/*	USART_ITConfig(UART5,USART_IT_RXNE,ENABLE);					//¿ªÆôÖÐ¶Ï
-	USART_ClearFlag(UART5, USART_FLAG_TC);
-	USART_Cmd(UART5,ENABLE);
-*/		  if(Test.tmt) Test.tmt=0;
+		  if(Test.tmt) Test.tmt=0;
 		  else		Test.tmt=1;
 //if(Test.tmt>6) Test.tmt=0;
 		  if((Tenir<enir_temp.adx+30)&&enir_temp.adx<(Tenir+30))
@@ -486,3 +485,139 @@ tmk=Tenir*100;
 	}
 }
 
+void InitPro(u8 ch,u8 typ)
+{
+	static int32_t adi,adt,adf,ctemp,tmk;
+		static u8 enir_t;//,c_tim[16]={0};
+		adi = channel_read(ch,typ);
+		if(tempOVER==0)
+	{	if(left_right[ch])	 	 pt_ad1[ch]=adi;
+
+	 else	pt_ad2[ch]=adi;
+	 adi=(pt_ad1[ch]+pt_ad2[ch])/2;
+
+	tmk=Tenir*100;
+
+//CurrentTemp[1]=	  Tenir;
+		switch(typ){
+//	 case TYPE_NC:tempOVER=1;
+//	 break;
+	 case PT100:
+
+	 adt=linear_calib(adi,LinearCoeff.Pt100[ch].Ks,LinearCoeff.Pt100[ch].Bt );
+	 ctemp=__pt_meas(&PT100_DESC, PT100_TBL, adt);
+	 break;
+	 
+	 case TYPE_K:adt=(adi-0x800000)*4; //LinearCoeff.JKT_[ch].Ks=10000;LinearCoeff.JKT_[ch].Bt=0;
+		 adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&K_TC_DESC, K_TC_TABLE, adf,tmk);
+	 break;
+	 
+	case TYPE_J:adt=(adi-0x800000)*4;
+		adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&J_TC_DESC, J_TC_TABLE, adf,tmk);
+	 break;
+	case TYPE_T:adt=(adi-0x800000)*4;
+		adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&T_TC_DESC, T_TC_TABLE, adf,tmk);
+	 break;
+	case TYPE_E:adt=(adi-0x800000)*4;
+		 adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&E_TC_DESC, E_TC_TABLE, adf,tmk);
+	 break;
+	case TYPE_R:adt=(adi-0x800000)*4;
+		 adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&R_TC_DESC, R_TC_TABLE, adf,tmk);
+	 break;
+	case TYPE_S:adt=(adi-0x800000)*4;
+		 adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&S_TC_DESC, S_TC_TABLE, adf,tmk);
+	 break;
+	case TYPE_B:adt=(adi-0x800000)*4;
+		 adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&B_TC_DESC, B_TC_TABLE, adf,tmk);
+	 break;
+	case TYPE_N:adt=(adi-0x800000)*4;
+		 adf=linear_calib(adt, LinearCoeff.JKT_[ch].Ks,LinearCoeff.JKT_[ch].Bt);
+	 ctemp=__tc_meas(&N_TC_DESC, N_TC_TABLE, adf,tmk);
+	 break;	 
+	 }		  }
+//cont++;	 
+//if(cont>1) 
+{//  	cont=0;
+//	if(ch==1)	Test.ch=5;
+//	else
+
+	
+
+//if(Test.ch==1)Test.ch=4;	if(ch!=4)	
+	 if(tempOVER==1)
+	 {CurrentTemp[ch]=0x7fff;}	 //
+	 else
+	 CurrentTemp[ch]=ctemp/100;
+	 }
+/*	 if(ctemp>(CurrentTemp[ch]+50)||CurrentTemp[ch]>(ctemp+50)){c_tim[ch]++; CurrentTemp[ch]++;}
+	 else	{CurrentTemp[ch]=ctemp;c_tim[ch]=0;}
+	 if(c_tim[ch]>1){c_tim[ch]=0;CurrentTemp[ch]=ctemp;}
+*/
+/*	  	 if(typ<PT100){
+			  if(SYSPAR.chnum==8){
+				   if(CurrentTemp[ch]>-2000){
+					if(ch==0){		if(CurrentTemp[7]==-2000) CurrentTemp[0]+=15;			}
+				   	else{		 if(CurrentTemp[ch-1]==-2000) CurrentTemp[ch]+=13;		   	 }
+			  		}
+					}
+			  if(SYSPAR.chnum==16){
+			  if(CurrentTemp[ch]>-2000){
+					if(ch==0){		if(CurrentTemp[15]==-2000) CurrentTemp[0]+=15;			}
+				   	else{		 if(CurrentTemp[ch-1]==-2000) CurrentTemp[ch]+=13;		   	 }
+			  		}	
+	 		}
+	 } */
+	 if(tempOVER==0)
+	 {if(SYSPAR.unit==2)	 {adf=TempC2K(CurrentTemp[ch]);CurrentTemp[ch]=adf;}//F
+
+	 if(SYSPAR.unit==1)	 {adf=2731+CurrentTemp[ch];CurrentTemp[ch]=adf;}//k
+	 }
+
+//t820;
+
+
+//	   if(Test.ad_bat<18){Test.tmp820=1;}// Tenir=10;
+		//   Test.ad_bat++;
+		 //  if(Test.ad_bat>18)Test.ad_bat=20;
+
+		  tmp0();
+		  if(Test.tmt) Test.tmt=0;
+		  else		Test.tmt=1;
+//if(Test.tmt>6) Test.tmt=0;
+		  if((Tenir<enir_temp.adx+30)&&enir_temp.adx<(Tenir+30))
+		  {tmp_emp[Test.tmt]=enir_temp.adx;enir_t=0;}
+			else		enir_t++;
+			if(enir_t>2){ tmp_emp[Test.tmt]=enir_temp.adx;enir_t=0; }
+
+		  Tenir=tmp_emp[0]/2+tmp_emp[1]/2;
+
+		  if(Tenir>800)Tenir=800;		  
+		  else if(Tenir<-300)Tenir=-300;
+//		  CurrentTemp[4]=Tenir;
+
+}
+
+void ds18b20init(void)
+{
+	static u8 enir_t;
+	tmp0();
+	if(Test.tmt) Test.tmt=0;
+	else		Test.tmt=1;
+//if(Test.tmt>6) Test.tmt=0;
+	if((Tenir<enir_temp.adx+30)&&enir_temp.adx<(Tenir+30))
+	{tmp_emp[Test.tmt]=enir_temp.adx;enir_t=0;}
+	else		enir_t++;
+	if(enir_t>2){ tmp_emp[Test.tmt]=enir_temp.adx;enir_t=0; }
+
+	Tenir=tmp_emp[0]/2+tmp_emp[1]/2;
+
+	if(Tenir>800)Tenir=800;		  
+	else if(Tenir<-300)Tenir=-300;
+}

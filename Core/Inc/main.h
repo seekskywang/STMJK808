@@ -73,6 +73,8 @@ extern u8 usaveflag;
 extern char inputbuf[10];
 extern u8 autooffflag;
 extern union	UU	enir_temp;
+extern u8 testres;
+extern u8 teststatus;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -103,6 +105,8 @@ void SYSPARRST(void);
 void DelayUs(u32 delay_us);
 void Brightness(void);
 void ad_pro(u8 ch,u8 typ);
+void InitPro(u8 ch,u8 typ);
+void ds18b20init(void);
 void ad7124_init(void);
 void proc_send_dw(int ch);
 void cal_process(void);

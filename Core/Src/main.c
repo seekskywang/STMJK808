@@ -87,6 +87,8 @@ u8 sdstatus;
 u8 testres;
 u8 teststatus;
 u32 sdsize;
+u8 inqbuf[36];
+INQUIRY_DATA inqdata;
 // 设置时间戳计数的基准日期
 RTC_DateTypeDef DateBase = {
     .Year = 22,
@@ -214,7 +216,7 @@ void UsbDataHandle(void)
 				
 				if(USB_Recive_Buffer[2] == 0 && USB_Recive_Buffer[3] == 0)//读实时数据
 				{
-					csendlen = 22;				
+								
 					csend = (u8*)malloc(sizeof(u8) * csendlen);				
 					memset(csend, 0, csendlen);//初始化，每个元素都为零
 					//发送数据CRC校验长度
@@ -226,9 +228,13 @@ void UsbDataHandle(void)
 					usbsendbuf[3] = USB_Recive_Buffer[3];
 					usbsendbuf[4] = 0x00;
 					if(SYSPAR.version == 0)
+					{
+						csendlen = 22;	
 						usbsendbuf[5] = 0x08;
-					else
+					}else{
+						csendlen = 14;	
 						usbsendbuf[5] = 0x04;
+					}
 //					usbsendbuf[6] = USB_Recive_Buffer[5]*2;
 					
 //					if(usbsendbuf[5]<= 16)
@@ -237,6 +243,8 @@ void UsbDataHandle(void)
 						{
 //							if(i<8)
 //							{
+							if(SYSPAR.version == 0)
+							{
 								if(CurrentTemp[i] == 0x7fff)
 								{
 									usbsendbuf[6+i*2] = 0x7F;
@@ -245,6 +253,16 @@ void UsbDataHandle(void)
 									usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
 									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
 								}
+							}else{
+								if(CurrentTemp[i*2] == 0x7fff)
+								{
+									usbsendbuf[6+i*2] = 0x7F;
+									usbsendbuf[7+i*2] = 0xFF;
+								}else{
+									usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
+									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
+								}
+							}
 //							}else{
 //								usbsendbuf[6+i*2] = 0xFF;
 //								usbsendbuf[7+i*2] = 0xFF;
@@ -837,6 +855,40 @@ u8 udisk_scan(void)
 	return UDISK_NOTREADY;
 }
 
+u8 sd_scan(void)
+{
+	static u8 res;
+	
+//	u8 i;
+//	char str[64];
+	if(usbstatus != UNCONNECTED)
+	{
+		res = HAL_GPIO_ReadPin(SD_CON_GPIO_Port,SD_CON_Pin);
+		if( res == 1)/* 检查U盘是否连接,等待U盘插入,对于SD卡,可以由单片机直接查询SD卡座的插拔状态引脚 */
+		{  
+//			DrawUdisk1();
+			LcdFillRec(289,6,297,19,BUTTONCOLOR);
+			usbstatus = UNCONNECTED;
+			fileflag = 0;
+			saveok=0;
+			return NO_CONNECTION;
+		}
+	}
+//	Delay(200);
+	if(usbstatus != CONNECTED)
+	{		
+		res = HAL_GPIO_ReadPin(SD_CON_GPIO_Port,SD_CON_Pin);
+		if(res == 0)
+		{
+//			DrawUdisk2();
+			DISP_SD();
+			usbstatus = CONNECTED;
+			return UDISK_READY;
+		}
+
+	}
+	return UDISK_NOTREADY;
+}
 
 uint16_t bat_get_adc(){
     //开启ADC1
@@ -981,18 +1033,42 @@ void UDISK_SAVE(void)
 	{
 		return;
 	}
-	for(i=0;i<8;i++)
+	if(SYSPAR.version == 0)//808
 	{
-
-		if(CurrentTemp[i] == 0x7fff)
+		for(i=0;i<8;i++)
+		{
+			if(CurrentTemp[i] == 0x7fff)
+			{
+				strcpy((char *)buf,"\tN/A");
+			}else{
+				sprintf((char *)buf,"\t%.1f",((double)DispTemp[i])/10);
+			}
+			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+			{
+				return;
+			}
+		}
+	}else{
+		for(i=0;i<4;i++)
+		{
+			if(CurrentTemp[i*2] == 0x7fff)
+			{
+				strcpy((char *)buf,"\tN/A");
+			}else{
+				sprintf((char *)buf,"\t%.1f",((double)DispTemp[i])/10);
+			}
+			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+			{
+				return;
+			}
+		}
+		for(i=0;i<4;i++)
 		{
 			strcpy((char *)buf,"\tN/A");
-		}else{
-			sprintf((char *)buf,"\t%.1f",((double)DispTemp[i])/10);
-		}
-		if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
-		{
-			return;
+			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+			{
+				return;
+			}
 		}
 	}
 	if(CH376FileClose(TRUE) != USB_INT_SUCCESS)//关闭文件
@@ -1150,7 +1226,7 @@ void SaveTime(void)
   * @retval int
   */
 int main(void)
-{
+ {
   /* USER CODE BEGIN 1 */
 	u8 ret,bat_c=0,usbdect=0,adcount=0,udiscount=0;
   /* USER CODE END 1 */
@@ -1199,7 +1275,7 @@ int main(void)
 	delay_ms(200);
 	BuzzerOff()
 	
-	
+//	SYSPAR.saveset=1;
 //	delay_ms(120);
 	
 //	while(ReadId() != 0x9341)
@@ -1221,6 +1297,7 @@ int main(void)
 //	//SaveSysPara(SYSPAR);
 	Test.f_run=RUN_t;
 	KeyFlag=0;
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -1230,7 +1307,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		
+//		DISP_HID();
+//		DISP_USB();
+//		DISP_SD();
 		newkey=ScanKey();
 		if(newkey!=oldkey) 
 			key_trg=1;
@@ -1303,6 +1382,7 @@ int main(void)
 				ucount=RTC_ReadTimeCounter(&hrtc);
 				if(ucount-ucountold >= SYSPAR.interval)
 				{
+					teststatus= CH376ReadBlock(inqbuf);
 					UDISK_SAVE();
 					ucountold=ucount;
 				}
@@ -1326,17 +1406,42 @@ int main(void)
 			}
 		}else if(SYSPAR.saveset == 1){//SD卡
 			sdstatus = HAL_GPIO_ReadPin(SD_CON_GPIO_Port,SD_CON_Pin);
-			testres = CH376DiskMount();
+			
 //			teststatus=CH376DiskQuery(&sdsize);
-			if(!HAL_GPIO_ReadPin(SD_CON_GPIO_Port,SD_CON_Pin))//识别到SD卡
+//			teststatus=CH376FileOpen("test.txt");
+			if(usbdect==20)
 			{
-				
+				sd_scan();
+				usbdect=0;
+			}else{
+				usbdect++;
+			}
+			if(usbstatus == CONNECTED)//识别到SD卡
+			{
+				testres = CH376DiskMount();
 				ucount=RTC_ReadTimeCounter(&hrtc);
 				if(ucount-ucountold >= SYSPAR.interval)
 				{
-					teststatus = CH376FileCreate("test.txt");
-//					UDISK_SAVE();
+					
+//					teststatus= CH376ReadBlock(inqbuf);
+//					teststatus = CH376FileCreate("TEST.TXT");
+					UDISK_SAVE();
 					ucountold=ucount;
+				}
+			}
+			if(saveok == 1)
+			{
+				if(udiscount > 5)
+				{
+					DISP_SD();
+				}else{
+					LcdFillRec(289,6,297,19,BUTTONCOLOR);
+				}
+				if(udiscount > 10)
+				{
+					udiscount=0;
+				}else{
+					udiscount++;
 				}
 			}
 		}
