@@ -1062,14 +1062,14 @@ void UDISK_SAVE(void)
 				return;
 			}
 		}
-		for(i=0;i<4;i++)
-		{
-			strcpy((char *)buf,"\tN/A");
-			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
-			{
-				return;
-			}
-		}
+//		for(i=0;i<4;i++)
+//		{
+//			strcpy((char *)buf,"\tN/A");
+//			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+//			{
+//				return;
+//			}
+//		}
 	}
 	if(CH376FileClose(TRUE) != USB_INT_SUCCESS)//关闭文件
 	{
