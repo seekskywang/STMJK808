@@ -202,7 +202,8 @@ void SaveTime(void);
 #define SD_CON_Pin GPIO_PIN_1
 #define SD_CON_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
-#define temperature_Pin GPIO_PIN_7
+//#define temperature_Pin GPIO_PIN_7
+#define temperature_Pin GPIO_PIN_4
 #define temperature_GPIO_Port GPIOC
 
 #define	RUN_t	1

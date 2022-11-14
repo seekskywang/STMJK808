@@ -122,10 +122,10 @@ void ad7124_reset(void){
 		DelayUs(500);
 //		ad7124_regw(REG_CONTROL,0x390);		  //reg=1
 		reg_control.all  = 0; // 清空CONTROL
-  reg_control.ncs_en     = 1; // 使能CS控制
-  reg_control.ref_en     = 1; // 内部基准电压使能
-  reg_control.power_mode = 2; // 全功耗模式
-  reg_control.mode       = 4; // 空闲模式
+		reg_control.ncs_en     = 1; // 使能CS控制
+		reg_control.ref_en     = 1; // 内部基准电压使能
+		reg_control.power_mode = 2; // 全功耗模式
+		reg_control.mode       = 4; // 空闲模式
 //  reg_control.clk_sel    = 0; // 内部614.4kHz时钟, CLK引脚不提供内部时钟
   ad7124_regw(REG_CONTROL, reg_control.all); 
 		DelayUs(500);
