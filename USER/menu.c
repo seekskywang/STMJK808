@@ -434,8 +434,12 @@ const char USEROFFSET_ITEM[][5]={
 	"RST"
 };
 
+const char SM_LOGO[][32]={
+	"Smart Sensor"
+};
+
 const char POWERON_ITEM808[][32]={
-	"JK808 MULTI CHANNEL TEMP.METER",
+	"MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
 	"Initializing Channel 3...",
@@ -448,7 +452,7 @@ const char POWERON_ITEM808[][32]={
 };
 
 const char POWERON_ITEM804[][32]={
-	"JK804 MULTI CHANNEL TEMP.METER",
+	"MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
 	"Initializing Channel 3...",
@@ -3069,9 +3073,17 @@ void DrawLogo(u16 x,u16 y)
 
 void DISP_POWERON(void)
 {
-	u8 i;
+	u32 i;
+	u32 logocolor;
 	LcdClear(BUTTONCOLOR);
-	DrawLogo(50,150);
+//	DrawLogo(50,150);
+//	Lcd_Str32((u8 *)SM_LOGO[0],60,100,STLOGO,BUTTONCOLOR);
+	for(i=256;i>0;i--)
+	{
+		logocolor=RGB888TORGB565((i<<16)|0x00FF00);
+		Lcd_Str32((u8 *)SM_LOGO[0],60,100,logocolor,BUTTONCOLOR);
+		delay_ms(3); 
+	}
 	delay_ms(800);
 	LcdClear(BUTTONCOLOR);
 	if(SYSPAR.version == 0)

@@ -8,10 +8,10 @@ struct __ASC_ZK_8x16
 	u8 ENCODE[16];
 };
 
-struct __ASC_ZK_24x32
+struct __ASC_ZK_16x32
 {
 	u8 code;
-	u8 ENCODE[96];
+	u8 ENCODE[64];
 };
 struct typFNT_GB16_16x16                 // 汉字字模数据结构
 {
@@ -92,7 +92,7 @@ struct __ASC_ZK_8x16_3
 	u8 ENCODE[7];
 };
 
-extern const struct __ASC_ZK_24x32  ZK_24x32[];
+extern const struct __ASC_ZK_16x32  ZK_16x32[];
 extern const struct __ASC_ZK_8x16  ZK_8x16[];
 extern const struct __ASC_ZK_12x24 ZK_12x24[];
 extern const struct typFNT_GB16_16x16 GB_16[];

@@ -958,6 +958,48 @@ void LcdPrintEn12x24(u8 code, u16 x, u16 y, u16 color,u16 bcolor)
 }
 
 /**************************************************************************************
+函数功能：在LCD上打印一个12X24英文字符
+输入：    code       字符内码
+          x,y	     目标显示位置坐标
+	  color	     字体颜色
+	  bcolor     背景颜色
+输出：	  无
+**************************************************************************************/
+
+void LcdPrintEn16x32(u8 code, u16 x, u16 y, u16 color,u16 bcolor)
+{
+	u8 ip=0,i,j,k,num=0;
+    do
+	{
+		if(ZK_16x32[ip].code == code)
+		{
+			LcdSetArea(x,y,x+15,y+31);
+			WriteCommand(0x2C);
+			for(i=0;i<32;i++)
+			{														
+				for(j=0;j<2;j++)
+				{
+					for(k=0;k<8;k++)
+					{
+						if(j*8+k==16) break;
+						if(ZK_16x32[ip].ENCODE[num]&(0x80>>k))
+			 				WriteData(color)
+
+			 			else
+			 				WriteData(bcolor)
+					}
+					num++;
+					if(j*8+k==16) break;
+				}
+			}
+			return;
+		}
+		ip++;
+	}
+	while(ZK_12x24[ip].code);
+}
+
+/**************************************************************************************
 函数功能：在LCD上打印一个48X54英文字符
 输入：    code       字符内码
           x,y	     目标显示位置坐标
@@ -1127,6 +1169,57 @@ void Lcd_Str16(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
 		}
 	}
 }
+
+void Lcd_Str24(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
+{
+	u8 i;
+	u16 px;	
+	i = 0;
+	px = x;
+//	px2=x+256;
+	while(str[i])
+	{
+		if(str[i] > 0x7F)//是汉字
+		{
+			LcdPrintHz16x16((str[i]<<8)|str[i+1],px,y,color,bcolor);
+			i += 2;
+			px += 16;
+		//	px2-=16;
+		}
+		else//非汉字
+		{
+			LcdPrintEn12x24(str[i],px, y, color,bcolor);
+			i++;
+			px += 8;
+		}
+	}
+}
+
+void Lcd_Str32(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
+{
+	u8 i;
+	u16 px;	
+	i = 0;
+	px = x;
+//	px2=x+256;
+	while(str[i])
+	{
+		if(str[i] > 0x7F)//是汉字
+		{
+			LcdPrintHz16x16((str[i]<<8)|str[i+1],px,y,color,bcolor);
+			i += 2;
+			px += 16;
+		//	px2-=16;
+		}
+		else//非汉字
+		{
+			LcdPrintEn16x32(str[i],px, y, color,bcolor);
+			i++;
+			px += 16;
+		}
+	}
+}
+
 void Lcd_Str15(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
 {
 	u8 i=0;

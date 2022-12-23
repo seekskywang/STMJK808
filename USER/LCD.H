@@ -23,7 +23,8 @@
 #define    BABYYELLOW    RGB888TORGB565(0xf0f032)   //µ­»ÆÉ«
 
 #define    BUTTONCOLOR     RGB888TORGB565(0x000000)	  //ºÚ
-#define    TOPCOLOR     	 RGB888TORGB565(0x000EE00)	  //ÂÌ
+#define    TOPCOLOR     	 RGB888TORGB565(0x00EE00)	  //ÂÌ
+#define    STLOGO     	 RGB888TORGB565(0xFFFF00)	  //»Æ
 #define    DATACOLOR     	 RGB888TORGB565(0xFFFFFF)	  //°×
 #define		 TCALCOLOR			 RGB888TORGB565(0xFF0000)//ºì
 #define		 BLUE1					 RGB888TORGB565(0x0033ff)
@@ -84,6 +85,7 @@ extern void LcdClear(u16 color);
 extern void LcdPrintEn(u8 code, u16 x, u16 y, u16 color,u16 bcolor);
 extern void LcdPrintHz(u16 code,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str32(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
+extern void Lcd_Str24(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str16(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str15(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str10(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
