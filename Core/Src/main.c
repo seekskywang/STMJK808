@@ -1252,7 +1252,7 @@ int main(void)
   MX_SPI3_Init();
   MX_FSMC_Init();
   MX_TIM3_Init();
-  MX_RTC_Init();
+//  MX_RTC_Init();
   MX_TIM2_Init();
   MX_SPI2_Init();
   MX_USB_DEVICE_Init();
@@ -1274,7 +1274,7 @@ int main(void)
 	ret=DS18B20_Init();
 	delay_ms(200);
 	BuzzerOff()
-	
+	MX_RTC_Init();
 //	SYSPAR.saveset=1;
 //	delay_ms(120);
 	

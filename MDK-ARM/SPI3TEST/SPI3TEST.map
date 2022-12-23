@@ -121,7 +121,6 @@ Section Cross References
     main.o(i.main) refers to main.o(i.MX_SPI3_Init) for MX_SPI3_Init
     main.o(i.main) refers to main.o(i.MX_FSMC_Init) for MX_FSMC_Init
     main.o(i.main) refers to main.o(i.MX_TIM3_Init) for MX_TIM3_Init
-    main.o(i.main) refers to main.o(i.MX_RTC_Init) for MX_RTC_Init
     main.o(i.main) refers to main.o(i.MX_TIM2_Init) for MX_TIM2_Init
     main.o(i.main) refers to main.o(i.MX_SPI2_Init) for MX_SPI2_Init
     main.o(i.main) refers to usb_device.o(i.MX_USB_DEVICE_Init) for MX_USB_DEVICE_Init
@@ -136,6 +135,7 @@ Section Cross References
     main.o(i.main) refers to flash.o(i.RdDevPara) for RdDevPara
     main.o(i.main) refers to flash.o(i.SYSPARCOMP) for SYSPARCOMP
     main.o(i.main) refers to 18b20.o(i.DS18B20_Init) for DS18B20_Init
+    main.o(i.main) refers to main.o(i.MX_RTC_Init) for MX_RTC_Init
     main.o(i.main) refers to ch376.o(i.Init_CH376) for Init_CH376
     main.o(i.main) refers to stm32f1xx_hal_tim.o(i.HAL_TIM_PWM_Start) for HAL_TIM_PWM_Start
     main.o(i.main) refers to main.o(i.Brightness) for Brightness
