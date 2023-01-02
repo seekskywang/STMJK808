@@ -1636,7 +1636,7 @@ static void MX_RTC_Init(void)
 		DateToUpdate.WeekDay = RTC_WEEKDAY_SUNDAY;
 		DateToUpdate.Month = RTC_MONTH_MAY;
 		DateToUpdate.Date = 1;
-		DateToUpdate.Year = 22;
+		DateToUpdate.Year = 23;
 
 //		if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
 //		{

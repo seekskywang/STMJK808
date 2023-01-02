@@ -319,11 +319,11 @@ const char BUTTON_TIME[][5]={
 const char SYSSET_ITEM[][20]={
 	"Multi Temp Meter",
 	"T,K,J,N,E,S,R,B",
-	"REV A1.1",
-	"REV A1.0",
+	"REV A1.1",//hardware
+	"REV A1.1",//software
 	"REV V1.0 Build 2000",
 };
-
+//1.1修改时间和序列号消失bug
 const char CAL_COMP[][6]={
 	"标准",
 	"实测",
@@ -1979,6 +1979,7 @@ void INPUT_CANCEL(void)
 				Lcd_Str16((u8 *)SYSSET_ITEM[i],144,22+(i+1)*18,DATACOLOR,BUTTONCOLOR);
 		}
 		DISP_PAGE_ITEM(pageflag,itempos);
+		Lcd_Str16((u8 *)SYSPAR.sn,144,22+2*18,DATACOLOR,BUTTONCOLOR);
 	}
 }
 
