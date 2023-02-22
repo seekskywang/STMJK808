@@ -186,7 +186,7 @@ const char SYS_ITEM[2][14][15]={
 	"自动关机",
 	"日期",
 	"时间",
-	"文件",
+//	"文件",
 	"触摸屏"},
 	{"MODEL",
 	"TC-MODEL",
@@ -200,7 +200,7 @@ const char SYS_ITEM[2][14][15]={
 	"APO",
 	"DATE",
 	"TIME",
-	"FILE",
+//	"FILE",
 	"TOUCH"}
 	
 };
@@ -320,10 +320,11 @@ const char SYSSET_ITEM[][20]={
 	"Multi Temp Meter",
 	"T,K,J,N,E,S,R,B",
 	"REV A1.1",//hardware
-	"REV A1.1",//software
+	"REV A1.2",//software
 	"REV V1.0 Build 2000",
 };
 //1.1修改时间和序列号消失bug
+//1.2去掉系统设置中的文件选项
 const char CAL_COMP[][6]={
 	"标准",
 	"实测",
@@ -1158,13 +1159,13 @@ void KEY_HANDLE(u8 key)
 							}
 							SaveTime();
 						}break;
+//						case 7:
+//						{
+//							SYSPAR.offsave=0;
+//							moveflag = 1;
+//							//SaveSysPara(SYSPAR);
+//						}break;
 						case 7:
-						{
-							SYSPAR.offsave=0;
-							moveflag = 1;
-							//SaveSysPara(SYSPAR);
-						}break;
-						case 8:
 						{
 							SYSPAR.touch=0;
 							moveflag = 1;
@@ -1243,13 +1244,13 @@ void KEY_HANDLE(u8 key)
 							}
 							SaveTime();
 						}break;
+//						case 7:
+//						{
+//							SYSPAR.offsave=1;
+//							moveflag = 1;
+//							//SaveSysPara(SYSPAR);
+//						}break;
 						case 7:
-						{
-							SYSPAR.offsave=1;
-							moveflag = 1;
-							//SaveSysPara(SYSPAR);
-						}break;
-						case 8:
 						{
 							SYSPAR.touch=1;
 							moveflag = 1;
@@ -1425,12 +1426,12 @@ void KEY_HANDLE(u8 key)
 				}break;	
 				case KEY_DOWN:
 				{
-					if(itempos<8)
+					if(itempos<7)
 					{
 						itempos++;
 					}
 					moveflag = 1;
-				}break;
+				}break; 
 				case KEY_LEFT:
 				{
 					if(itempos>4)
@@ -1444,6 +1445,8 @@ void KEY_HANDLE(u8 key)
 					if(itempos<5)
 					{
 						itempos+=4;
+						if(itempos > 7)
+							itempos = 7;
 					}
 					moveflag = 1;
 				}break;
@@ -1715,11 +1718,11 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 						else
 							Lcd_Str16((u8 *)TIME_BUTTON2[SYSPAR.language][i],1+(i*70)+2,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
 					}break;
+//					case 7:
+//					{
+//						Lcd_Str16((u8 *)FILE_ITEM[SYSPAR.language][i],2+(i*70)+2,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
+//					}break;
 					case 7:
-					{
-						Lcd_Str16((u8 *)FILE_ITEM[SYSPAR.language][i],2+(i*70)+2,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
-					}break;
-					case 8:
 					{
 						Lcd_Str16((u8 *)TOUCH_ITEM[SYSPAR.language][i],17+(i*70)+2,UP_LINE_OFFSET+7,BUTTONCOLOR,FILLBLOCK);
 					}break;
@@ -2212,7 +2215,7 @@ void DISP_SYS(void)//系统设置页面固定显示
 	{
 		Lcd_Str16((u8 *)SYS_ITEM[SYSPAR.language][i],8,22+i*18,FILLBLOCK,BUTTONCOLOR);
 	}
-	for(i=0;i<4;i++)
+	for(i=0;i<3;i++)
 	{
 		Lcd_Str16((u8 *)SYS_ITEM[SYSPAR.language][i+10],168,22+(6+i)*18,FILLBLOCK,BUTTONCOLOR);
 	}
@@ -2333,15 +2336,17 @@ void DISP_PAGE_ITEM(u8 page,u8 pos)
 			else
 				Lcd_Str16((u8 *)DIM_ITEM[SYSPAR.language][SYSPAR.autooff],SETCOL1,SYSROW1+SYSROWOFFSET*9,BABYYELLOW,BUTTONCOLOR);
 			
-			if(itempos == 7)//文件
-				Lcd_Str16((u8 *)FILE_ITEM[SYSPAR.language][SYSPAR.offsave],SETCOL2,SYSROW1+SYSROWOFFSET*8,BUTTONCOLOR,BABYYELLOW);
-			else
-				Lcd_Str16((u8 *)FILE_ITEM[SYSPAR.language][SYSPAR.offsave],SETCOL2,SYSROW1+SYSROWOFFSET*8,BABYYELLOW,BUTTONCOLOR);
+//			if(itempos == 7)//文件
+//				Lcd_Str16((u8 *)FILE_ITEM[SYSPAR.language][SYSPAR.offsave],
+//			SETCOL2,SYSROW1+SYSROWOFFSET*8,BUTTONCOLOR,BABYYELLOW);
+//			else
+//				Lcd_Str16((u8 *)FILE_ITEM[SYSPAR.language][SYSPAR.offsave],
+//			SETCOL2,SYSROW1+SYSROWOFFSET*8,BABYYELLOW,BUTTONCOLOR);
 			
-			if(itempos == 8)//触摸屏
-				Lcd_Str16((u8 *)TOUCH_ITEM[SYSPAR.language][SYSPAR.touch],SETCOL2,SYSROW1+SYSROWOFFSET*9,BUTTONCOLOR,BABYYELLOW);
+			if(itempos == 7)//触摸屏
+				Lcd_Str16((u8 *)TOUCH_ITEM[SYSPAR.language][SYSPAR.touch],SETCOL2,SYSROW1+SYSROWOFFSET*8,BUTTONCOLOR,BABYYELLOW);
 			else
-				Lcd_Str16((u8 *)TOUCH_ITEM[SYSPAR.language][SYSPAR.touch],SETCOL2,SYSROW1+SYSROWOFFSET*9,BABYYELLOW,BUTTONCOLOR);
+				Lcd_Str16((u8 *)TOUCH_ITEM[SYSPAR.language][SYSPAR.touch],SETCOL2,SYSROW1+SYSROWOFFSET*8,BABYYELLOW,BUTTONCOLOR);
 		}break;
 		case PAGE_CAL:
 		{

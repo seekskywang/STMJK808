@@ -485,13 +485,13 @@ void TOUCH_HANDLE(u16 x,u16 y)
 							}
 							SaveTime();
 						}break;
+//						case 7:
+//						{
+//							SYSPAR.offsave=0;
+//							moveflag = 1;
+//							//SaveSysPara(SYSPAR);
+//						}break;
 						case 7:
-						{
-							SYSPAR.offsave=0;
-							moveflag = 1;
-							//SaveSysPara(SYSPAR);
-						}break;
-						case 8:
 						{
 							SYSPAR.touch=0;
 							moveflag = 1;
@@ -665,13 +665,13 @@ void TOUCH_HANDLE(u16 x,u16 y)
 							}
 							SaveTime();
 						}break;
+//						case 7:
+//						{
+//							SYSPAR.offsave=1;
+//							moveflag = 1;
+//							//SaveSysPara(SYSPAR);
+//						}break;
 						case 7:
-						{
-							SYSPAR.offsave=1;
-							moveflag = 1;
-							//SaveSysPara(SYSPAR);
-						}break;
-						case 8:
 						{
 							SYSPAR.touch=1;
 							moveflag = 1;
