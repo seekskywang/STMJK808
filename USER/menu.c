@@ -1312,13 +1312,13 @@ void KEY_HANDLE(u8 key)
 							moveflag = 1;
 							SaveTime();
 						}break;
+//						case 7:
+//						{
+//							SYSPAR.offsave=2;
+//							moveflag = 1;
+//							//SaveSysPara(SYSPAR);
+//						}break;
 						case 7:
-						{
-							SYSPAR.offsave=2;
-							moveflag = 1;
-							//SaveSysPara(SYSPAR);
-						}break;
-						case 8:
 						{
 							TOUCH_Adjust();
 						}break;
@@ -1366,13 +1366,13 @@ void KEY_HANDLE(u8 key)
 							moveflag = 1;
 							SaveTime();
 						}break;
+//						case 7:
+//						{
+//							SYSPAR.offsave=3;
+//							moveflag = 1;
+//							//SaveSysPara(SYSPAR);
+//						}break;
 						case 7:
-						{
-							SYSPAR.offsave=3;
-							moveflag = 1;
-							//SaveSysPara(SYSPAR);
-						}break;
-						case 8:
 						{
 							TOUCH_RESET();
 						}break;
