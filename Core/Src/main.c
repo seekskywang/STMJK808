@@ -1274,7 +1274,7 @@ int main(void)
 	ret=DS18B20_Init();
 	delay_ms(200);
 	BuzzerOff()
-//	MX_RTC_Init();
+	MX_RTC_Init();
 //	SYSPAR.saveset=1;
 //	delay_ms(120);
 	

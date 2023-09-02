@@ -68,15 +68,20 @@ const char Version[2][4]={
 	"804",
 };
 	
+const char Logo[2][5]={
+	"JK  ",
+	"NONE",
+};
+
 const char CAL_BUTTON[2][5][8]={
 	{"测量",
 	"设置",
-	"系统",
+	"",
 	"",
 	"复位"},
 	{"MEAS ",
 	"SETUP ",
-	"SYSTEM",
+	"",
 	"",
 	"RST"}
 	
@@ -320,11 +325,12 @@ const char SYSSET_ITEM[][20]={
 	"Multi Temp Meter",
 	"T,K,J,N,E,S,R,B",
 	"REV A1.1",//hardware
-	"REV A1.2",//software
+	"REV A1.3",//software
 	"REV V1.0 Build 2000",
 };
 //1.1修改时间和序列号消失bug
 //1.2去掉系统设置中的文件选项
+//1.3增加中性选择
 const char CAL_COMP[][6]={
 	"标准",
 	"实测",
@@ -435,7 +441,8 @@ const char USEROFFSET_ITEM[][5]={
 	"RST"
 };
 
-const char POWERON_ITEM808[][32]={
+const char POWERON_ITEM808[][10][32]={
+	{
 	"JK808 MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
@@ -445,16 +452,35 @@ const char POWERON_ITEM808[][32]={
 	"Initializing Channel 6...",
 	"Initializing Channel 7...",
 	"Initializing Channel 8...",
-	"Done!"
+	"Done!"},
+	{
+	"MULTI CHANNEL TEMP.METER",
+	"Initializing Channel 1...",
+	"Initializing Channel 2...",
+	"Initializing Channel 3...",
+	"Initializing Channel 4...",
+	"Initializing Channel 5...",
+	"Initializing Channel 6...",
+	"Initializing Channel 7...",
+	"Initializing Channel 8...",
+	"Done!"},
 };
 
-const char POWERON_ITEM804[][32]={
+const char POWERON_ITEM804[][6][32]={
+	{
 	"JK804 MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
 	"Initializing Channel 3...",
 	"Initializing Channel 4...",
-	"Done!"
+	"Done!"},
+	{
+	"MULTI CHANNEL TEMP.METER",
+	"Initializing Channel 1...",
+	"Initializing Channel 2...",
+	"Initializing Channel 3...",
+	"Initializing Channel 4...",
+	"Done!"},
 };
 
 void POWER_OFF(void)
@@ -1541,8 +1567,9 @@ void KEY_HANDLE(u8 key)
 					{
 						case 0:
 						{
-							pageflag = PAGE_SYST;
+							SYSPAR.jkflag = !SYSPAR.jkflag;
 							displayflag = 1;
+							SaveSysPara(SYSPAR);//保存数据
 						}break;
 
 						default:break;
@@ -1759,6 +1786,7 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 					default:break;
 				}
 				Lcd_Str16((u8 *)Version[SYSPAR.version],1+(3*70)+17,UP_LINE_OFFSET+7,TCALCOLOR,FILLBLOCK);
+				Lcd_Str16((u8 *)Logo[SYSPAR.jkflag],1+(2*70)+17,UP_LINE_OFFSET+7,TCALCOLOR,FILLBLOCK);
 			}break;
 			default:break;
 		}
@@ -3077,7 +3105,8 @@ void DISP_POWERON(void)
 {
 	u8 i;
 	LcdClear(BUTTONCOLOR);
-	DrawLogo(50,150);
+	if(SYSPAR.jkflag == 0)
+		DrawLogo(50,150);
 	delay_ms(800);
 	LcdClear(BUTTONCOLOR);
 	if(SYSPAR.version == 0)
@@ -3088,7 +3117,7 @@ void DISP_POWERON(void)
 			{
 				InitPro(i-1,SYSPAR.SensorType[0]);
 			}
-			Lcd_Str16((u8 *)POWERON_ITEM808[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
+			Lcd_Str16((u8 *)POWERON_ITEM808[SYSPAR.jkflag][i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
 			DelayMs(200);
 		}
 	}else{
@@ -3100,7 +3129,7 @@ void DISP_POWERON(void)
 			}else{
 				ds18b20init();
 			}
-			Lcd_Str16((u8 *)POWERON_ITEM804[i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
+			Lcd_Str16((u8 *)POWERON_ITEM804[SYSPAR.jkflag][i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
 			DelayMs(200);
 		}
 		ds18b20init();
