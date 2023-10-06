@@ -6,14 +6,14 @@ spi3test\stm32f1xx_hal_sram.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Include/core_cm3.h
-spi3test\stm32f1xx_hal_sram.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+spi3test\stm32f1xx_hal_sram.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Include/cmsis_version.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-spi3test\stm32f1xx_hal_sram.o: E:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+spi3test\stm32f1xx_hal_sram.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 spi3test\stm32f1xx_hal_sram.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
