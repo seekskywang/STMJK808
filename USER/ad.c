@@ -180,7 +180,7 @@ int32_t ad7124_convert(void) {
 //	DelayUs(20000);
 //  ad7124_regw(REG_CONTROL, 0x304);			  //reg=1
 //   TTON0();
-	for ( i = 1; i < 10000; i++) {
+	for ( i = 1; i < 160; i++) {//FS-5:86  FS-6:151
 	DelayUs(200);//ad7124_sleep(100);
 
 	reg_status.all = ad7124_regr(REG_STATUS);  //reg=0
@@ -355,9 +355,9 @@ u32 channel_read(uint8_t chn,uint8_t type) {
 	ad = ad7124_convert();
 	if(ad==0x7fffffff)tempOVER=1;
 	else
-	{tempOVER=0;fs	= AD7124_FS_TBL[5];}
+	{tempOVER=0;fs	= AD7124_FS_TBL[6];}
 
-	if(Test.f_run==CAL_t)fs=AD7124_FS_TBL[5];
+	if(Test.f_run==CAL_t)fs=AD7124_FS_TBL[6];
 //  if(type==PT100||type==PT1000)fs	= AD7124_FS_TBL[5];
 // else  	   fs	= AD7124_FS_TBL[5];
 //sense on or off
