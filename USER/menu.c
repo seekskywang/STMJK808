@@ -1803,7 +1803,7 @@ void KEY_COLORBLOCK(u8 page)	  	   //按键显示 page-页面
 static void DISP_TOP(u8 page)//显示页头
 {
 //	LcdFillRec(0,0,82,18,TOPCOLOR);
-	Lcd_Str16((u8 *)TOP_CHAR[0][page-1],1,1,BUTTONCOLOR,TOPCOLOR);
+	Lcd_Str16((u8 *)TOP_CHAR[SYSPAR.language][page-1],1,1,BUTTONCOLOR,TOPCOLOR);
 }
 
 static void DISP_CHNUM(void)//显示通道名称
