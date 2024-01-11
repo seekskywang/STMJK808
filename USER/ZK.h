@@ -110,4 +110,5 @@ extern const struct __ASC_ZK_10x15  ZK_10x15[];
 extern const struct	__ASC_ZK_48x54  ZK_48x54[];
 extern const struct __ASC_ZK_8x16_2  ZK_8x16_2[];
 extern const struct __ASC_ZK_8x16_3  ZK_8x16_3[];
+extern const struct __ASC_ZK_16x32 ZK_16x32[];
 #endif
