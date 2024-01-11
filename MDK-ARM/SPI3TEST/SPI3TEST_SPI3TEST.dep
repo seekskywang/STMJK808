@@ -1,7 +1,7 @@
 Dependencies for Project 'SPI3TEST', Target 'SPI3TEST': (DO NOT MODIFY !)
 CompilerVersion: 5060422::V5.06 update 4 (build 422)::ARMCC
 F (startup_stm32f103xe.s)(0x626B4396)(--cpu Cortex-M3 -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include--pd "__UVISION_VERSION SETA 538" --pd "_RTE_ SETA 1" --pd "STM32F10X_HD SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32f103xe.lst --xref -o spi3test\startup_stm32f103xe.o --depend spi3test\startup_stm32f103xe.d)
-F (../Core/Src/main.c)(0x659F5198)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\main.o --omf_browse spi3test\main.crf --depend spi3test\main.d)
+F (../Core/Src/main.c)(0x659F563B)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\main.o --omf_browse spi3test\main.crf --depend spi3test\main.d)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -39,9 +39,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -91,9 +91,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -141,9 +141,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1040,7 +1040,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-F (..\USER\LCD.C)(0x63F57315)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\lcd.o --omf_browse spi3test\lcd.crf --depend spi3test\lcd.d)
+F (..\USER\LCD.C)(0x659F58B4)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\lcd.o --omf_browse spi3test\lcd.crf --depend spi3test\lcd.d)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -1078,9 +1078,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1089,7 +1089,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (..\USER\ch376.h)(0x626A4A29)
 I (..\USER\FILESYS.h)(0x626A41A1)
-F (..\USER\menu.c)(0x659F416C)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\menu.o --omf_browse spi3test\menu.crf --depend spi3test\menu.d)
+F (..\USER\menu.c)(0x659F58DA)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\menu.o --omf_browse spi3test\menu.crf --depend spi3test\menu.d)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -1127,9 +1127,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1138,8 +1138,8 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (..\USER\ch376.h)(0x626A4A29)
 I (..\USER\FILESYS.h)(0x626A41A1)
-F (..\USER\ZK.C)(0x63F57315)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\zk.o --omf_browse spi3test\zk.crf --depend spi3test\zk.d)
-I (..\USER\ZK.h)(0x63F57315)
+F (..\USER\ZK.C)(0x659F563F)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\zk.o --omf_browse spi3test\zk.crf --depend spi3test\zk.d)
+I (..\USER\ZK.h)(0x659F563F)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -1177,7 +1177,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
@@ -1187,7 +1187,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (..\USER\ch376.h)(0x626A4A29)
 I (..\USER\FILESYS.h)(0x626A41A1)
-F (..\USER\flash.c)(0x659F416C)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\flash.o --omf_browse spi3test\flash.crf --depend spi3test\flash.d)
+F (..\USER\flash.c)(0x659F563F)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\flash.o --omf_browse spi3test\flash.crf --depend spi3test\flash.d)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -1225,9 +1225,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1274,9 +1274,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1285,7 +1285,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (..\USER\ch376.h)(0x626A4A29)
 I (..\USER\FILESYS.h)(0x626A41A1)
-F (..\USER\ad.c)(0x655EA6A4)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\ad.o --omf_browse spi3test\ad.crf --depend spi3test\ad.d)
+F (..\USER\ad.c)(0x659F563F)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\ad.o --omf_browse spi3test\ad.crf --depend spi3test\ad.d)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -1323,9 +1323,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1335,7 +1335,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (..\USER\ch376.h)(0x626A4A29)
 I (..\USER\FILESYS.h)(0x626A41A1)
 I (..\USER\ad.h)(0x655EA6A4)
-F (..\USER\meas.c)(0x659F416C)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\meas.o --omf_browse spi3test\meas.crf --depend spi3test\meas.d)
+F (..\USER\meas.c)(0x659F563F)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\USER -I ../USB_DEVICE/App -I ../USB_DEVICE/Target -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc-I.\RTE\_SPI3TEST-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="538" -D_RTE_ -DSTM32F10X_HD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xE-o spi3test\meas.o --omf_browse spi3test\meas.crf --depend spi3test\meas.d)
 I (../Core/Inc/main.h)(0x655EA699)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x624A5E08)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x62C6328A)
@@ -1373,9 +1373,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1422,9 +1422,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1471,9 +1471,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1520,9 +1520,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1607,9 +1607,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1658,9 +1658,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
@@ -1711,9 +1711,9 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (../Core/Inc/main.h)(0x655EA699)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -1768,9 +1768,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -1826,9 +1826,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -1879,9 +1879,9 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x57F606B8)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x57F606B8)
 I (../Core/Inc/main.h)(0x655EA699)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -1934,9 +1934,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -1989,9 +1989,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -2043,9 +2043,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)
@@ -2098,9 +2098,9 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h)(0x624A5E08)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h)(0x624A5E08)
-I (..\USER\LCD.h)(0x63F57315)
+I (..\USER\LCD.h)(0x659F563F)
 I (..\USER\menu.h)(0x62D76F2E)
-I (..\USER\ZK.h)(0x63F57315)
+I (..\USER\ZK.h)(0x659F563F)
 I (..\USER\touch.h)(0x6276176E)
 I (..\USER\cal.h)(0x62553271)
 I (..\USER\delay.h)(0x5B4A8FD4)

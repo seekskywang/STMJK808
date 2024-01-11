@@ -443,9 +443,13 @@ const char USEROFFSET_ITEM[][5]={
 	"RST"
 };
 
+const char SM_LOGO[][32]={
+	"Smart Sensor"
+};
+
 const char POWERON_ITEM808[][10][32]={
 	{
-	"JK808 MULTI CHANNEL TEMP.METER",
+	"MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
 	"Initializing Channel 3...",
@@ -470,7 +474,7 @@ const char POWERON_ITEM808[][10][32]={
 
 const char POWERON_ITEM804[][6][32]={
 	{
-	"JK804 MULTI CHANNEL TEMP.METER",
+	"MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
 	"Initializing Channel 3...",
@@ -487,7 +491,7 @@ const char POWERON_ITEM804[][6][32]={
 
 const char POWERON_ITEM802[][6][32]={
 	{
-	"JK802 MULTI CHANNEL TEMP.METER",
+	"MULTI CHANNEL TEMP.METER",
 	"Initializing Channel 1...",
 	"Initializing Channel 2...",
 	"Done!"},
@@ -3202,10 +3206,19 @@ void DrawLogo(u16 x,u16 y)
 
 void DISP_POWERON(void)
 {
-	u8 i;
+	u16 i;
+	u16 logocolor;
+	
 	LcdClear(BUTTONCOLOR);
-	if(SYSPAR.jkflag == 0)
-		DrawLogo(50,150);
+//	if(SYSPAR.jkflag == 0)
+//		DrawLogo(50,150);
+	for(i=256;i>0;i--)
+	{
+		logocolor=RGB888TORGB565((i<<16)|0x00FF00);
+		Lcd_Str32((u8 *)SM_LOGO[0],60,100,logocolor,BUTTONCOLOR);
+		delay_ms(3); 
+	}
+	delay_ms(800);
 	delay_ms(800);
 	LcdClear(BUTTONCOLOR);
 	if(SYSPAR.version == 0)
