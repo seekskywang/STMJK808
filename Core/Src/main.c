@@ -227,7 +227,7 @@ void UsbDataHandle(void)
 					usbsendbuf[2] = USB_Recive_Buffer[2];
 					usbsendbuf[3] = USB_Recive_Buffer[3];
 					usbsendbuf[4] = 0x00;
-					if(SYSPAR.version == 0)
+					if(SYSPAR.version == 0 || SYSPAR.version == 2)
 					{
 						csendlen = 22;	
 						usbsendbuf[5] = 0x08;
@@ -253,7 +253,7 @@ void UsbDataHandle(void)
 									usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
 									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
 								}
-							}else{
+							}else if(SYSPAR.version == 1){
 								if(CurrentTemp[i*2] == 0x7fff)
 								{
 									usbsendbuf[6+i*2] = 0x7F;
@@ -261,6 +261,21 @@ void UsbDataHandle(void)
 								}else{
 									usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
 									usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
+								}
+							}else if(SYSPAR.version == 2){
+								if(i == 2 || i == 5)
+								{
+									if(CurrentTemp[i*2] == 0x7fff)
+									{
+										usbsendbuf[6+i*2] = 0x7F;
+										usbsendbuf[7+i*2] = 0xFF;
+									}else{
+										usbsendbuf[6+i*2] = (u8)(DispTemp[i]>> 8);
+										usbsendbuf[7+i*2] = (u8)(DispTemp[i]);
+									}
+								}else{
+									usbsendbuf[6+i*2] = 0x7F;
+									usbsendbuf[7+i*2] = 0xFF;
 								}
 							}
 //							}else{
@@ -1048,7 +1063,7 @@ void UDISK_SAVE(void)
 				return;
 			}
 		}
-	}else{
+	}else if(SYSPAR.version == 1){//804
 		for(i=0;i<4;i++)
 		{
 			if(CurrentTemp[i*2] == 0x7fff)
@@ -1062,14 +1077,29 @@ void UDISK_SAVE(void)
 				return;
 			}
 		}
-//		for(i=0;i<4;i++)
-//		{
-//			strcpy((char *)buf,"\tN/A");
-//			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
-//			{
-//				return;
-//			}
-//		}
+
+	}else if(SYSPAR.version == 2){//802
+			if(CurrentTemp[2] == 0x7fff)
+			{
+				strcpy((char *)buf,"\tN/A");
+			}else{
+				sprintf((char *)buf,"\t%.1f",((double)DispTemp[2])/10);
+			}
+			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+			{
+				return;
+			}
+			
+			if(CurrentTemp[5] == 0x7fff)
+			{
+				strcpy((char *)buf,"\tN/A");
+			}else{
+				sprintf((char *)buf,"\t%.1f",((double)DispTemp[5])/10);
+			}
+			if(CH376ByteWrite(buf,strlen((const char *)buf), NULL ) != USB_INT_SUCCESS)//写入
+			{
+				return;
+			}
 	}
 	if(CH376FileClose(TRUE) != USB_INT_SUCCESS)//关闭文件
 	{

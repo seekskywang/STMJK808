@@ -3,7 +3,7 @@
 <title>Static Call Graph - [SPI3TEST\SPI3TEST.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SPI3TEST\SPI3TEST.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Tue Jan 09 08:43:54 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Thu Jan 11 10:25:33 2024
 <BR><P>
 <H3>Maximum Stack Usage =        672 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -2863,7 +2863,7 @@ Global Symbols
 <LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitPro
 </UL>
 
-<P><STRONG><a name="[1c6]"></a>UDISK_SAVE</STRONG> (Thumb, 718 bytes, Stack size 248 bytes, main.o(i.UDISK_SAVE))
+<P><STRONG><a name="[1c6]"></a>UDISK_SAVE</STRONG> (Thumb, 906 bytes, Stack size 248 bytes, main.o(i.UDISK_SAVE))
 <BR><BR>[Stack]<UL><LI>Max Depth = 496<LI>Call Chain = UDISK_SAVE &rArr; CH376FileCreatePath &rArr; CH376FileOpenDir &rArr; CH376FileOpen &rArr; CH376SetFileName &rArr; CH376ReadVar32 &rArr; CH376Read32bitDat &rArr; xReadCH376Data &rArr; SPIx_ReadWriteByte &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_us
@@ -3385,7 +3385,7 @@ Global Symbols
 <P><STRONG><a name="[19]"></a>UsageFault_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f1xx_it.o(i.UsageFault_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f103xe.o(RESET)
 </UL>
-<P><STRONG><a name="[1f0]"></a>UsbDataHandle</STRONG> (Thumb, 2460 bytes, Stack size 24 bytes, main.o(i.UsbDataHandle))
+<P><STRONG><a name="[1f0]"></a>UsbDataHandle</STRONG> (Thumb, 2600 bytes, Stack size 24 bytes, main.o(i.UsbDataHandle))
 <BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = UsbDataHandle &rArr; USBD_CUSTOM_HID_SendReport &rArr; USBD_LL_Transmit &rArr; HAL_PCD_EP_Transmit &rArr; USB_EPStartXfer &rArr; USB_WritePMA
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USBD_CUSTOM_HID_SendReport
