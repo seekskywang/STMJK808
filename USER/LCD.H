@@ -85,6 +85,7 @@ extern void LcdPrintEn(u8 code, u16 x, u16 y, u16 color,u16 bcolor);
 extern void LcdPrintHz(u16 code,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str32(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str16(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
+extern void Lcd_Str32(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str15(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void Lcd_Str10(u8 *str,u16 x,u16 y,u16 color,u16 bcolor);
 extern void LcdPrintEn12x24(u8 code, u16 x, u16 y, u16 color,u16 bcolor);

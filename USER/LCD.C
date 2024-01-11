@@ -1101,7 +1101,30 @@ void LcdPrintHz16x16(u16 code,u16 x,u16 y,u16 color,u16 bcolor)
 // 	}while(GB_324[ip].code[0] != 0 || GB_324[ip].code[1] != 0);
 // }
 
-
+void Lcd_Str32(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
+{
+	u8 i;
+	u16 px;	
+	i = 0;
+	px = x;
+//	px2=x+256;
+	while(str[i])
+	{
+		if(str[i] > 0x7F)//ÊÇºº×Ö
+		{
+			LcdPrintHz16x16((str[i]<<8)|str[i+1],px,y,color,bcolor);
+			i += 2;
+			px += 16;
+		//	px2-=16;
+		}
+		else//·Çºº×Ö
+		{
+			LcdPrintEn16x32(str[i],px, y, color,bcolor);
+			i++;
+			px += 16;
+		}
+	}
+}
 
 void Lcd_Str16(u8 *str,u16 x,u16 y,u16 color,u16 bcolor)
 {

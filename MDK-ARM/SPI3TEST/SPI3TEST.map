@@ -837,6 +837,7 @@ Section Cross References
     lcd.o(i.Lcd_Str15) refers to lcd.o(i.LcdPrintEn8x16_2) for LcdPrintEn8x16_2
     lcd.o(i.Lcd_Str16) refers to lcd.o(i.LcdPrintHz16x16) for LcdPrintHz16x16
     lcd.o(i.Lcd_Str16) refers to lcd.o(i.LcdPrintEn8x16) for LcdPrintEn8x16
+    lcd.o(i.Lcd_Str32) refers to lcd.o(i.LcdPrintHz16x16) for LcdPrintHz16x16
     lcd.o(i.ReadId) refers to lcd.o(.data) for para1
     lcd.o(i.screen_init) refers to delay.o(i.delay_ms) for delay_ms
     menu.o(i.DEL_NUM) refers to lcd.o(i.RGB888TORGB565) for RGB888TORGB565
@@ -904,6 +905,7 @@ Section Cross References
     menu.o(i.DISP_PAGE_ITEM) refers to main.o(.data) for LinearCoeff
     menu.o(i.DISP_POWERON) refers to lcd.o(i.RGB888TORGB565) for RGB888TORGB565
     menu.o(i.DISP_POWERON) refers to lcd.o(i.LcdClear) for LcdClear
+    menu.o(i.DISP_POWERON) refers to lcd.o(i.Lcd_Str32) for Lcd_Str32
     menu.o(i.DISP_POWERON) refers to delay.o(i.delay_ms) for delay_ms
     menu.o(i.DISP_POWERON) refers to meas.o(i.InitPro) for InitPro
     menu.o(i.DISP_POWERON) refers to lcd.o(i.Lcd_Str16) for Lcd_Str16
