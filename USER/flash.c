@@ -233,7 +233,7 @@ void SYSPARCOMP(void)
 	{
 		SYSPAR.touch = 1;
 	}
-	if(SYSPAR.version > 1)
+	if(SYSPAR.version > 2)
 	{
 		SYSPAR.version = 0;
 	}

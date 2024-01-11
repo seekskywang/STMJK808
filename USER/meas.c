@@ -424,10 +424,15 @@ tmk=Tenir*100;
 		Test.ch++;
 		if(Test.ch>7)
 			Test.ch=0;
-	}else{//804
+	}else if(SYSPAR.version == 1){//804
 		Test.ch+=2;
 		if(Test.ch>7)
 			Test.ch=0;
+	}else if(SYSPAR.version == 2){//802
+		if(Test.ch != 2)
+			Test.ch = 2;
+		else if(Test.ch == 2)
+			Test.ch = 5;
 	}
 //if(Test.ch==1)Test.ch=4;	if(ch!=4)	
 	 if(tempOVER==1)

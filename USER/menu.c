@@ -21,7 +21,7 @@ char inputbuf[10];
 u8 powerondelay;
 RTC_DateTypeDef DateBuf;  //获取日期结构体
 RTC_TimeTypeDef TimeBuf;   //获取时间结构体
-u8 TDISPNUM[2]={8,4};
+u8 TDISPNUM[3]={8,4,2};
 const char TESTDISP_BUTTON[2][5][6]={
 	{"设置",
 	"系统",
@@ -63,9 +63,10 @@ const char SYSSET_BUTTON[2][5][8]={
 	
 };
 
-const char Version[2][4]={
+const char Version[3][4]={
 	"808",
 	"804",
+	"802",
 };
 	
 const char Logo[2][5]={
@@ -325,12 +326,13 @@ const char SYSSET_ITEM[][20]={
 	"Multi Temp Meter",
 	"T,K,J,N,E,S,R,B",
 	"REV A1.1",//hardware
-	"REV A1.3",//software
+	"REV A1.4",//software
 	"REV V1.0 Build 2000",
 };
 //1.1修改时间和序列号消失bug
 //1.2去掉系统设置中的文件选项
 //1.3增加中性选择
+//1.4增加802版本
 const char CAL_COMP[][6]={
 	"标准",
 	"实测",
@@ -483,6 +485,18 @@ const char POWERON_ITEM804[][6][32]={
 	"Done!"},
 };
 
+const char POWERON_ITEM802[][6][32]={
+	{
+	"JK802 MULTI CHANNEL TEMP.METER",
+	"Initializing Channel 1...",
+	"Initializing Channel 2...",
+	"Done!"},
+	{
+	"MULTI CHANNEL TEMP.METER",
+	"Initializing Channel 1...",
+	"Initializing Channel 2...",
+	"Done!"},
+};
 void POWER_OFF(void)
 {
 	SaveSysPara(SYSPAR);//保存数据
@@ -1577,8 +1591,10 @@ void KEY_HANDLE(u8 key)
 				}break;
 				case KEY_F4:
 				{
-					
-					SYSPAR.version=!SYSPAR.version;
+					SYSPAR.version ++;
+					if(SYSPAR.version >2)
+						SYSPAR.version = 0;
+//					SYSPAR.version=!SYSPAR.version;
 					displayflag = 1;
 				}break;
 				case KEY_F5:
@@ -1822,7 +1838,7 @@ static void DISP_CHNUM(void)//显示通道名称
 				Lcd_Str16((u8 *)numchar,8,42+i/2*38,BABYYELLOW,BUTTONCOLOR);//1357
 			}
 		}
-	}else{//804
+	}else if(SYSPAR.version == 1){//804
 		for(i=0;i<4;i++)
 		{
 			sprintf(numchar,"%02d:",i+1);
@@ -1831,6 +1847,17 @@ static void DISP_CHNUM(void)//显示通道名称
 				Lcd_Str16((u8 *)numchar,168,61+i/2*76,BABYYELLOW,BUTTONCOLOR);//24
 			}else{
 				Lcd_Str16((u8 *)numchar,8,61+i/2*76,BABYYELLOW,BUTTONCOLOR);//13
+			}
+		}
+	}else{//802
+		for(i=0;i<2;i++)
+		{
+			sprintf(numchar,"%02d:",i+1);
+			if(i==1)
+			{
+				Lcd_Str16((u8 *)numchar,168,80,BABYYELLOW,BUTTONCOLOR);//24
+			}else{
+				Lcd_Str16((u8 *)numchar,8,80,BABYYELLOW,BUTTONCOLOR);//13
 			}
 		}
 	}
@@ -2088,7 +2115,7 @@ void DISP_TEMP(void)//显示温度
 				}
 			}
 		}
-	}else{//804
+	}else if(SYSPAR.version == 1){//804
 		for(i=0;i<4;i++)
 		{
 			if(i%2)
@@ -2157,6 +2184,75 @@ void DISP_TEMP(void)//显示温度
 				}
 			}
 		}
+	}else if(SYSPAR.version == 2){//802
+		for(i=0;i<2;i++)
+		{
+			if(i==1)
+			{
+				if(CurrentTemp[5] == 0x7fff)
+				{
+					if(i+1==itempos)
+						LcdPrintStr24("------",168+40,80,BUTTONCOLOR,DATACOLOR);//24);
+					else
+						LcdPrintStr24("------",168+40,80,DATACOLOR,BUTTONCOLOR);//24);
+				}else{
+					DispTemp[1]=CurrentTemp[5]+SYSPAR.TempOffset[1];
+					Hex_Format(DispTemp[1],1,5,0);
+					if(DispTemp[1] > SYSPAR.upper || DispTemp[1] < SYSPAR.lower)
+					{
+						compflag=1;
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,168+40,80,BUTTONCOLOR,TCALCOLOR);//24);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,168+40,80,TCALCOLOR,BUTTONCOLOR);//24);
+							
+						}
+					}else{
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,168+40,80,BUTTONCOLOR,TOPCOLOR);//24);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,168+40,80,TOPCOLOR,BUTTONCOLOR);//24);
+							
+						}
+					}
+				}
+			}else{
+				if(CurrentTemp[2] == 0x7fff)
+				{
+					if(i+1==itempos)
+						LcdPrintStr24("------",8+40,80,BUTTONCOLOR,DATACOLOR);//13);
+					else
+						LcdPrintStr24("------",8+40,80,DATACOLOR,BUTTONCOLOR);//13);
+				}else{
+					DispTemp[0]=CurrentTemp[2]+SYSPAR.TempOffset[0];
+					Hex_Format(DispTemp[0],1,5,0);
+					if(DispTemp[0] > SYSPAR.upper || DispTemp[0] < SYSPAR.lower)
+					{
+						compflag=1;
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,8+40,80,BUTTONCOLOR,TCALCOLOR);//13);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,8+40,80,TCALCOLOR,BUTTONCOLOR);//13);
+						}
+					}else{
+						if(i+1==itempos)
+						{
+							LcdPrintStr24((u8 *)DispBuf,8+40,80,BUTTONCOLOR,TOPCOLOR);//13);
+						}
+						else{
+							LcdPrintStr24((u8 *)DispBuf,8+40,80,TOPCOLOR,BUTTONCOLOR);//13);
+						}
+					}
+					
+				}
+			}
+		}
 	}
 	if(compflag==1 && SYSPAR.alarm == 0)
 	{
@@ -2201,6 +2297,9 @@ void DISP_TEST(void)//测量显示页面固定显示
 		{
 			if(i%2 == 0)
 				LcdPrintHorz(1,30+38*i,319,DATACOLOR);		//804横线
+		}else if(SYSPAR.version == 2){
+			if(i == 0 || i == 4)
+				LcdPrintHorz(1,30+38*i,319,DATACOLOR);		//802横线
 		}else{
 			LcdPrintHorz(1,30+38*i,319,DATACOLOR);		//808横线
 		}	
@@ -3120,7 +3219,7 @@ void DISP_POWERON(void)
 			Lcd_Str16((u8 *)POWERON_ITEM808[SYSPAR.jkflag][i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
 			DelayMs(200);
 		}
-	}else{
+	}else if(SYSPAR.version == 1){//JK804
 		for(i=0;i<6;i++)
 		{
 			if(i>0&&i<5)
@@ -3130,6 +3229,19 @@ void DISP_POWERON(void)
 				ds18b20init();
 			}
 			Lcd_Str16((u8 *)POWERON_ITEM804[SYSPAR.jkflag][i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
+			DelayMs(200);
+		}
+		ds18b20init();
+	}else{//JK804
+		for(i=0;i<4;i++)
+		{
+			if(i>0&&i<5)
+			{
+				InitPro((i-1)*2,SYSPAR.SensorType[0]);
+			}else{
+				ds18b20init();
+			}
+			Lcd_Str16((u8 *)POWERON_ITEM802[SYSPAR.jkflag][i],2,2+18*i,DATACOLOR,BUTTONCOLOR);
 			DelayMs(200);
 		}
 		ds18b20init();
