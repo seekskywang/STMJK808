@@ -8,6 +8,12 @@ struct __ASC_ZK_8x16
 	u8 ENCODE[16];
 };
 
+struct __ASC_ZK_16x32
+{
+	u8 code;
+	u8 ENCODE[64];
+};
+
 struct __ASC_ZK_24x32
 {
 	u8 code;

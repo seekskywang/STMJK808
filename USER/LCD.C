@@ -621,7 +621,38 @@ void TFT_Draw_Point(u16 x,u8 y,u16 color)
 	  bcolor     背景颜色
 输出：	  无
 **************************************************************************************/
+void LcdPrintEn16x32(u8 code, u16 x, u16 y, u16 color,u16 bcolor)
+{
+	u8 ip=0,i,j,k,num=0;
+    do
+	{
+		if(ZK_16x32[ip].code == code)
+		{
+			LcdSetArea(x,y,x+15,y+31);
+			WriteCommand(0x2C);
+			for(i=0;i<32;i++)
+			{														
+				for(j=0;j<2;j++)
+				{
+					for(k=0;k<8;k++)
+					{
+						if(j*8+k==16) break;
+						if(ZK_16x32[ip].ENCODE[num]&(0x80>>k))
+			 				WriteData(color)
 
+			 			else
+			 				WriteData(bcolor)
+					}
+					num++;
+					if(j*8+k==16) break;
+				}
+			}
+			return;
+		}
+		ip++;
+	}
+	while(ZK_12x24[ip].code);
+}
 
 /**************************************************************************************
 函数功能：在LCD上打印一个8X16英文字符
